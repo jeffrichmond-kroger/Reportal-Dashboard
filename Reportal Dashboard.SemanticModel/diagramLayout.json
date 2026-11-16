@@ -10,10 +10,11 @@
       "nodes": [
         {
           "location": {
-            "x": 880.98000439493751,
-            "y": 192.09947564343923
+            "x": 973.98000439493751,
+            "y": 177.09947564343923
           },
           "nodeIndex": "Organization",
+          "nodeLineageTag": "be653e15-f311-42c7-a95f-ebef370dd672",
           "size": {
             "height": 300,
             "width": 234
@@ -22,10 +23,11 @@
         },
         {
           "location": {
-            "x": 57.208136213824119,
-            "y": 300.15227708909811
+            "x": 34.208136213824119,
+            "y": 437.15227708909811
           },
           "nodeIndex": "Fiscal Period",
+          "nodeLineageTag": "86f45a9b-2a20-4830-a4cb-bcfb4bb3f0b2",
           "size": {
             "height": 296,
             "width": 234
@@ -34,10 +36,11 @@
         },
         {
           "location": {
-            "x": 50,
-            "y": -50
+            "x": 25,
+            "y": 0
           },
           "nodeIndex": "Fiscal Week",
+          "nodeLineageTag": "0723c252-5399-445c-b613-4e1b961cb3fb",
           "size": {
             "height": 300,
             "width": 234
@@ -46,10 +49,11 @@
         },
         {
           "location": {
-            "x": 646.98000439493751,
-            "y": 143.68941171262315
+            "x": 687.98000439493751,
+            "y": 137.68941171262315
           },
           "nodeIndex": "Metric",
+          "nodeLineageTag": "918de526-4523-4cf8-a52a-a15801d892d3",
           "size": {
             "height": 300,
             "width": 234
@@ -70,10 +74,11 @@
         },
         {
           "location": {
-            "x": 362.81848877015841,
-            "y": 334.19895128687841
+            "x": 407.81848877015841,
+            "y": 361.19895128687841
           },
           "nodeIndex": "Weekly Score",
+          "nodeLineageTag": "37a18808-9834-47bf-a10b-6db8cbaef1be",
           "size": {
             "height": 300,
             "width": 234
