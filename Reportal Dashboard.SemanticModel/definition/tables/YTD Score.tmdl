@@ -1,0 +1,185 @@
+table 'YTD Score'
+	lineageTag: 3867720a-f613-43dd-9bc1-d45ce96843df
+
+	column OrganizationScopeKey
+		dataType: string
+		lineageTag: d507e15c-6124-4240-b3ec-5436d819d04b
+		summarizeBy: none
+		sourceColumn: OrganizationScopeKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrganizationScopeLevel
+		dataType: string
+		lineageTag: 502a58e4-f750-4973-92fc-afa5dfbd559a
+		summarizeBy: none
+		sourceColumn: OrganizationScopeLevel
+
+		annotation SummarizationSetBy = Automatic
+
+	column DivisionNumber
+		dataType: string
+		lineageTag: 8544b79a-38de-430b-aabe-90be3b794c60
+		summarizeBy: none
+		sourceColumn: DivisionNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column DistrictNumber
+		dataType: string
+		lineageTag: 4fe7d5ae-3928-4a85-bb46-ef347b900598
+		summarizeBy: none
+		sourceColumn: DistrictNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column SiteNumber
+		dataType: string
+		lineageTag: 0a428a78-77ef-4041-8e1c-e0c86a3accbe
+		summarizeBy: none
+		sourceColumn: SiteNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalWeekKey
+		dataType: int64
+		formatString: 0
+		lineageTag: e4f16aba-cb25-4673-a0e5-2fd2b070a7c3
+		summarizeBy: none
+		sourceColumn: FiscalWeekKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalPeriodKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 77c8edd1-559b-4db8-a3b9-35c9fba902b7
+		summarizeBy: count
+		sourceColumn: FiscalPeriodKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SnapshotDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: aee246fe-2326-44a1-ac36-b7d5c2a8c555
+		summarizeBy: none
+		sourceColumn: SnapshotDate
+
+		variation Variation
+			isDefault
+			relationship: 87f0b5da-3769-491f-a505-01d6fb98f1e7
+			defaultHierarchy: LocalDateTable_6078e769-efc5-442c-8940-4398fe9ba62b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column MetricKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 0b629240-58c9-4f2a-8dbc-745d026a9f3c
+		summarizeBy: none
+		sourceColumn: MetricKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnderlyingValue
+		dataType: double
+		lineageTag: bd4678ad-697e-4592-9621-cb52f7760a2b
+		summarizeBy: sum
+		sourceColumn: UnderlyingValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DisplayValue
+		dataType: double
+		lineageTag: 4bb9726e-f376-4e35-9adb-003890f45c00
+		summarizeBy: sum
+		sourceColumn: DisplayValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CalculationText
+		dataType: string
+		lineageTag: 80c3063c-4f93-42a3-90b1-3147c6c010e0
+		summarizeBy: none
+		sourceColumn: CalculationText
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScoreValue
+		dataType: double
+		lineageTag: 8c97a391-9dcc-436e-a5f2-10c27029aff4
+		summarizeBy: sum
+		sourceColumn: ScoreValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ColorCode
+		dataType: string
+		lineageTag: 20fc2de0-6713-4d19-a669-d4945ae11512
+		summarizeBy: none
+		sourceColumn: ColorCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Numerator
+		dataType: double
+		lineageTag: b1a669e2-8041-4e3a-9a13-b793e908df0f
+		summarizeBy: sum
+		sourceColumn: Numerator
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Denominator
+		dataType: double
+		lineageTag: 51d86bab-625a-4a96-99b3-8ad9e72271a5
+		summarizeBy: sum
+		sourceColumn: Denominator
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column GoalValue
+		dataType: double
+		lineageTag: 75d8a504-5b7d-467c-b642-ab32c6fa44b6
+		summarizeBy: sum
+		sourceColumn: GoalValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column LoadDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1c3c9093-9bf4-4176-8af1-01ad24f47d20
+		summarizeBy: none
+		sourceColumn: LoadDateTime
+
+		variation Variation
+			isDefault
+			relationship: 32a29252-fd38-41f7-bcfc-d4f8bb17d61a
+			defaultHierarchy: LocalDateTable_3a68965c-4d0f-4041-b049-db3133a1ca5d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'YTD Score' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("81reportal-sqlserver01-f28884e84e81bf38.database.windows.net", "reportaldb"),
+				    reportal_factYTDScore_vw = Source{[Schema="reportal",Item="factYTDScore_vw"]}[Data]
+				in
+				    reportal_factYTDScore_vw
+

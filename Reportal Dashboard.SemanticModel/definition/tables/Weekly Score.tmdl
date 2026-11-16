@@ -1,0 +1,213 @@
+table 'Weekly Score'
+	lineageTag: 37a18808-9834-47bf-a10b-6db8cbaef1be
+
+	column OrganizationScopeKey
+		dataType: string
+		lineageTag: 59d03e00-f468-4e3b-9df9-6a262b468a3a
+		summarizeBy: none
+		sourceColumn: OrganizationScopeKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrganizationScopeLevel
+		dataType: string
+		lineageTag: 024c339a-82d2-4727-8474-98ed83231733
+		summarizeBy: none
+		sourceColumn: OrganizationScopeLevel
+
+		annotation SummarizationSetBy = Automatic
+
+	column DivisionNumber
+		dataType: string
+		lineageTag: 4e190459-cb53-427f-a823-4a67f6bb3081
+		summarizeBy: none
+		sourceColumn: DivisionNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column DistrictNumber
+		dataType: string
+		lineageTag: 3e890bcb-cfc1-4f8e-84db-07dc7888528c
+		summarizeBy: none
+		sourceColumn: DistrictNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column SiteNumber
+		dataType: string
+		lineageTag: 512fe827-92d4-4f9a-bd9d-f1d4c846aa36
+		summarizeBy: none
+		sourceColumn: SiteNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalWeekKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 46ed2356-cbe6-40d3-a0d4-755e5caa3539
+		summarizeBy: none
+		sourceColumn: FiscalWeekKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalPeriodKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 2b9d751b-53e0-4f61-b69a-137c9f90582b
+		summarizeBy: count
+		sourceColumn: FiscalPeriodKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 449947f0-62bc-4997-9584-27f6ead5df53
+		summarizeBy: none
+		sourceColumn: WeekStartDate
+
+		variation Variation
+			isDefault
+			relationship: 32fa4a50-8fc5-49c6-a2b6-ea5e9225254e
+			defaultHierarchy: LocalDateTable_2828b5b9-32e2-4bde-b91c-d177f9481fbe.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column WeekEndDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d324dae2-2b6f-403a-a736-628125e0eaf8
+		summarizeBy: none
+		sourceColumn: WeekEndDate
+
+		variation Variation
+			isDefault
+			relationship: ae2c7397-3c0c-445d-ab71-c258b0172846
+			defaultHierarchy: LocalDateTable_c26ef5e8-39bf-4922-9a73-42d8786ecd56.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column MetricKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 04979720-fbb2-4916-9bf4-e51b307abfe7
+		summarizeBy: none
+		sourceColumn: MetricKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CalculationText
+		dataType: string
+		lineageTag: 93d0b039-d728-47e2-85c4-8ce6e2460ca4
+		summarizeBy: none
+		sourceColumn: CalculationText
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnderlyingValue
+		dataType: double
+		lineageTag: bd0b0142-0da7-4b22-9177-03ef9073ade5
+		summarizeBy: sum
+		sourceColumn: UnderlyingValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DisplayValue
+		dataType: double
+		lineageTag: 4bbe8dc4-4196-4e17-bf25-48c6893cfbb9
+		summarizeBy: sum
+		sourceColumn: DisplayValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ScoreValue
+		dataType: double
+		lineageTag: 44e6c46b-dfb5-4ecc-a59f-b6b57a7a448e
+		summarizeBy: sum
+		sourceColumn: ScoreValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ArrowCode
+		dataType: string
+		lineageTag: 31150ee5-b14d-4a6d-ba5f-6876a229b259
+		summarizeBy: none
+		sourceColumn: ArrowCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column ColorCode
+		dataType: string
+		lineageTag: 36f630a0-e090-433b-b0aa-cb4b322d16b8
+		summarizeBy: none
+		sourceColumn: ColorCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column GoalText
+		dataType: string
+		lineageTag: 8891eb01-a24b-49d5-9561-9bf4ca7656c7
+		summarizeBy: none
+		sourceColumn: GoalText
+
+		annotation SummarizationSetBy = Automatic
+
+	column DistrictRank
+		dataType: int64
+		formatString: 0
+		lineageTag: d0f21112-1a85-456f-8c10-cce3ff712135
+		summarizeBy: sum
+		sourceColumn: DistrictRank
+
+		annotation SummarizationSetBy = Automatic
+
+	column DivisionRank
+		dataType: int64
+		formatString: 0
+		lineageTag: bf396875-9623-4836-81cf-2e4c4564abef
+		summarizeBy: sum
+		sourceColumn: DivisionRank
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceModifiedBy
+		dataType: string
+		lineageTag: a646d254-ef6e-4353-8ab4-b070123d70a5
+		summarizeBy: none
+		sourceColumn: SourceModifiedBy
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceModifiedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0a06f8e2-e64a-4c91-a7c9-973652948531
+		summarizeBy: none
+		sourceColumn: SourceModifiedDateTime
+
+		variation Variation
+			isDefault
+			relationship: 267fed41-9210-4083-b8c1-dc4d13dc7d98
+			defaultHierarchy: LocalDateTable_84f063b0-f06d-441a-b6ae-067f0dc96676.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Weekly Score' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("81reportal-sqlserver01-f28884e84e81bf38.database.windows.net", "reportaldb"),
+				    reportal_factWeeklyScore_vw = Source{[Schema="reportal",Item="factWeeklyScore_vw"]}[Data]
+				in
+				    reportal_factWeeklyScore_vw
+

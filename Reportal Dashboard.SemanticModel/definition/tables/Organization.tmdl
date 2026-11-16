@@ -1,0 +1,179 @@
+table Organization
+	lineageTag: be653e15-f311-42c7-a95f-ebef370dd672
+
+	column OrganizationSiteKey
+		dataType: string
+		lineageTag: cf686593-1bc4-4cdf-894a-c22a01a15f0a
+		summarizeBy: none
+		sourceColumn: OrganizationSiteKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DivisionNumber
+		dataType: string
+		lineageTag: cb0c94b0-c62b-46c0-a1f1-0f861f1202b5
+		summarizeBy: none
+		sourceColumn: DivisionNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column DivisionName
+		dataType: string
+		lineageTag: ca498d96-89df-4fa2-88a4-03233c75a305
+		summarizeBy: none
+		sourceColumn: DivisionName
+
+		annotation SummarizationSetBy = Automatic
+
+	column DivisionDisplay
+		dataType: string
+		lineageTag: 65dc1106-608e-4483-8442-6db813840268
+		summarizeBy: none
+		sourceColumn: DivisionDisplay
+
+		annotation SummarizationSetBy = Automatic
+
+	column DistrictNumber
+		dataType: string
+		lineageTag: fea8a3e3-8b94-4a9b-88b1-da273913f24c
+		summarizeBy: none
+		sourceColumn: DistrictNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column DistrictDisplay
+		dataType: string
+		lineageTag: 5113b177-e608-4898-9a75-49dd2c08358e
+		summarizeBy: none
+		sourceColumn: DistrictDisplay
+
+		annotation SummarizationSetBy = Automatic
+
+	column SiteNumber
+		dataType: string
+		lineageTag: 28c7e285-b840-4540-8aab-4ef059603194
+		summarizeBy: none
+		sourceColumn: SiteNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column SiteDisplay
+		dataType: string
+		lineageTag: 4248edf4-7494-421d-81f6-bdc02ead0276
+		summarizeBy: none
+		sourceColumn: SiteDisplay
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActiveFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 25267a41-51c7-4bf3-bcad-10ca76cbd6a6
+		summarizeBy: none
+		sourceColumn: ActiveFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCentralFillFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7582ee09-0140-4529-a2c3-957c0daab9b3
+		summarizeBy: none
+		sourceColumn: IsCentralFillFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column Is340BFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 46be728f-2f5f-4d55-926b-21e10c0d3738
+		summarizeBy: none
+		sourceColumn: Is340BFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsTLCFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2a0d900e-580d-4d5a-ae82-6cdce54cc7a0
+		summarizeBy: none
+		sourceColumn: IsTLCFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column FacilityID
+		dataType: string
+		lineageTag: 146d025e-39ad-42bd-9fc9-b34eafee23a7
+		summarizeBy: none
+		sourceColumn: FacilityID
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCOEFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7c2aa8c0-20e3-4674-bbf8-600a4350a108
+		summarizeBy: none
+		sourceColumn: IsCOEFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column NABPNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: 622ba39d-993b-4f85-a8b4-8cc33220a206
+		summarizeBy: sum
+		sourceColumn: NABPNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column NPINumber
+		dataType: int64
+		formatString: 0
+		lineageTag: ddc20c58-0180-4df6-b18e-c6f093bde168
+		summarizeBy: sum
+		sourceColumn: NPINumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column ServiceCertifiedFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 18cf2a23-a524-4f7a-9ad8-36623a6ce449
+		summarizeBy: none
+		sourceColumn: ServiceCertifiedFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column AttractCertifiedFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 0ce6d0d1-c4ba-4974-a2b9-2e42bad5a28f
+		summarizeBy: none
+		sourceColumn: AttractCertifiedFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceModifiedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c2171c39-2928-415d-970d-535a4ce11498
+		summarizeBy: none
+		sourceColumn: SourceModifiedDateTime
+
+		variation Variation
+			isDefault
+			relationship: e6b4ceb4-9d51-4fcb-bf76-5da7f2a0ed75
+			defaultHierarchy: LocalDateTable_a476b585-dee6-4565-a6ce-9fde68a6450d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Organization = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("81reportal-sqlserver01-f28884e84e81bf38.database.windows.net", "reportaldb"),
+				    reportal_dimOrganization_vw = Source{[Schema="reportal",Item="dimOrganization_vw"]}[Data]
+				in
+				    reportal_dimOrganization_vw
+

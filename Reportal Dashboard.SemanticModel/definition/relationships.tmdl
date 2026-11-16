@@ -1,0 +1,105 @@
+relationship 6b9bb65f-7a88-453e-a470-5627ba638b0e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Period'.PeriodStartDate
+	toColumn: LocalDateTable_f9bb453c-c5df-4cfb-9354-e648e9a1acfa.Date
+
+relationship c87937a2-044b-4ed6-a337-c5c22379e6e1
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Period'.PeriodEndDate
+	toColumn: LocalDateTable_167ab237-2add-47b3-8d94-a7a5dd1484cf.Date
+
+relationship 103382ab-6e6d-4508-80cf-6a05fa8dc827
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.FiscalYearStartDate
+	toColumn: LocalDateTable_4ed6054b-47ec-4280-8397-6202985d82ab.Date
+
+relationship 86bb7293-f644-4e6f-8a5b-ee81ff7d5835
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.FiscalYearEndDate
+	toColumn: LocalDateTable_95623359-38f0-49b2-badf-3155f0c6221a.Date
+
+relationship 4500a7c9-154e-4a9c-9a30-5ddde39d449b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.QuarterStartDate
+	toColumn: LocalDateTable_38759654-8862-4e64-bf0e-13491d457a88.Date
+
+relationship dd511911-cb12-4eff-bd42-6361f1c92662
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.QuarterEndDate
+	toColumn: LocalDateTable_b641268b-bc1b-4d3a-b771-04a9a57a2cca.Date
+
+relationship 3e75c2a3-e4f1-4a24-861c-51041bf4759c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.PeriodStartDate
+	toColumn: LocalDateTable_8ef3722d-8667-44e0-b654-2fdda02f780f.Date
+
+relationship da11ebd7-e716-41de-9b36-c80680904154
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.PeriodEndDate
+	toColumn: LocalDateTable_859605e3-270b-4af3-8105-e06d68cbb9a0.Date
+
+relationship fedfb5a5-48d2-4a0c-a3e3-151da5c1bae6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.WeekStartDate
+	toColumn: LocalDateTable_0fee50dd-f0b8-4cf5-ae93-4f1985dfc156.Date
+
+relationship 8d1a6c36-70da-4bb8-89c5-47b480f0e47f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fiscal Week'.WeekEndDate
+	toColumn: LocalDateTable_e1409e07-d606-49e4-9aad-e9e03431a5db.Date
+
+relationship 3e9ad6c7-a49b-43a9-a0ee-c5d1b33e51f5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Metric.SourceModifiedDateTime
+	toColumn: LocalDateTable_3dfc1f5b-1d05-4aa6-aa21-c8ed6fd39213.Date
+
+relationship e6b4ceb4-9d51-4fcb-bf76-5da7f2a0ed75
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Organization.SourceModifiedDateTime
+	toColumn: LocalDateTable_a476b585-dee6-4565-a6ce-9fde68a6450d.Date
+
+relationship 32fa4a50-8fc5-49c6-a2b6-ea5e9225254e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Weekly Score'.WeekStartDate
+	toColumn: LocalDateTable_2828b5b9-32e2-4bde-b91c-d177f9481fbe.Date
+
+relationship ae2c7397-3c0c-445d-ab71-c258b0172846
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Weekly Score'.WeekEndDate
+	toColumn: LocalDateTable_c26ef5e8-39bf-4922-9a73-42d8786ecd56.Date
+
+relationship 267fed41-9210-4083-b8c1-dc4d13dc7d98
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Weekly Score'.SourceModifiedDateTime
+	toColumn: LocalDateTable_84f063b0-f06d-441a-b6ae-067f0dc96676.Date
+
+relationship 87f0b5da-3769-491f-a505-01d6fb98f1e7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'YTD Score'.SnapshotDate
+	toColumn: LocalDateTable_6078e769-efc5-442c-8940-4398fe9ba62b.Date
+
+relationship 32a29252-fd38-41f7-bcfc-d4f8bb17d61a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'YTD Score'.LoadDateTime
+	toColumn: LocalDateTable_3a68965c-4d0f-4041-b049-db3133a1ca5d.Date
+
+relationship AutoDetected_0c6f8db5-7c1d-4ce0-8367-2fa0c3f68677
+	fromColumn: 'Fiscal Week'.FiscalPeriodKey
+	toColumn: 'Fiscal Period'.FiscalPeriodKey
+
+relationship AutoDetected_c8ebc084-3cd7-4c2b-b1e8-7d7bdb9bae0a
+	fromColumn: 'Weekly Score'.FiscalWeekKey
+	toColumn: 'Fiscal Week'.FiscalWeekKey
+
+relationship AutoDetected_22e43960-9439-4092-a5e8-a9bab36c141f
+	fromColumn: 'YTD Score'.FiscalWeekKey
+	toColumn: 'Fiscal Week'.FiscalWeekKey
+
+relationship AutoDetected_3c698bf1-4498-4540-bf80-caa1ebcb7ec5
+	fromColumn: 'Weekly Score'.MetricKey
+	toColumn: Metric.MetricKey
+
+relationship AutoDetected_3af6bacc-5155-4d45-a092-6f06f849c1fe
+	fromColumn: 'YTD Score'.MetricKey
+	toColumn: Metric.MetricKey
+

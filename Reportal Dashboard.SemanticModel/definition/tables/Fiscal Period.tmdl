@@ -1,0 +1,106 @@
+table 'Fiscal Period'
+	lineageTag: 86f45a9b-2a20-4830-a4cb-bcfb4bb3f0b2
+
+	column FiscalPeriodKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 498436f6-b60e-4a6d-a6fe-85bc1f744a85
+		summarizeBy: none
+		sourceColumn: FiscalPeriodKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: e58943ef-5ce0-472d-a8dd-f063569bf7ed
+		summarizeBy: sum
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalPeriodNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: 845180dc-e1e7-438d-a28f-43f8bc5b5b65
+		summarizeBy: sum
+		sourceColumn: FiscalPeriodNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column PeriodLabel
+		dataType: string
+		lineageTag: 610a8a6a-a6e5-42b5-8915-d1d38ef7687e
+		summarizeBy: none
+		sourceColumn: PeriodLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	column PeriodStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9721de78-3d39-466d-9b52-74c0292ab5d0
+		summarizeBy: none
+		sourceColumn: PeriodStartDate
+
+		variation Variation
+			isDefault
+			relationship: 6b9bb65f-7a88-453e-a470-5627ba638b0e
+			defaultHierarchy: LocalDateTable_f9bb453c-c5df-4cfb-9354-e648e9a1acfa.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PeriodEndDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 82f049a4-d930-4bc0-834b-d4a95baa8db5
+		summarizeBy: none
+		sourceColumn: PeriodEndDate
+
+		variation Variation
+			isDefault
+			relationship: c87937a2-044b-4ed6-a337-c5c22379e6e1
+			defaultHierarchy: LocalDateTable_167ab237-2add-47b3-8d94-a7a5dd1484cf.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PreviousFiscalPeriodKey
+		dataType: int64
+		formatString: 0
+		lineageTag: e47547eb-325b-4068-a4d2-d97be16269ee
+		summarizeBy: count
+		sourceColumn: PreviousFiscalPeriodKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column NextFiscalPeriodKey
+		dataType: int64
+		formatString: 0
+		lineageTag: dc749650-8651-4a0e-b8fb-80e68d0da8a0
+		summarizeBy: count
+		sourceColumn: NextFiscalPeriodKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column PeriodSort
+		dataType: int64
+		formatString: 0
+		lineageTag: 2847704d-a3bf-4647-b30c-b80269a85843
+		summarizeBy: sum
+		sourceColumn: PeriodSort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Fiscal Period' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("81reportal-sqlserver01-f28884e84e81bf38.database.windows.net", "reportaldb"),
+				    reportal_dimFiscalPeriod_vw = Source{[Schema="reportal",Item="dimFiscalPeriod_vw"]}[Data]
+				in
+				    reportal_dimFiscalPeriod_vw
+

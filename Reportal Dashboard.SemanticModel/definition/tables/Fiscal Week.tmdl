@@ -1,0 +1,236 @@
+table 'Fiscal Week'
+	lineageTag: 0723c252-5399-445c-b613-4e1b961cb3fb
+
+	column FiscalWeekKey
+		dataType: int64
+		formatString: 0
+		lineageTag: f282d91a-cea4-46da-991a-4dc7c0e2054b
+		summarizeBy: none
+		sourceColumn: FiscalWeekKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalPeriodKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 6f5a8d0a-f812-4141-acc4-1487688de40a
+		summarizeBy: none
+		sourceColumn: FiscalPeriodKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: b4cc233b-5162-4805-be14-7971d5472955
+		summarizeBy: sum
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalQuarterNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: 631b6c3f-c186-4e7b-b613-63ec68581f3a
+		summarizeBy: sum
+		sourceColumn: FiscalQuarterNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalPeriodNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: 4f5d8489-5b3b-4416-aca1-174db8bd0ded
+		summarizeBy: sum
+		sourceColumn: FiscalPeriodNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column PeriodWeekNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: ffc157a0-fed4-4777-8f6b-afdffbf3c709
+		summarizeBy: sum
+		sourceColumn: PeriodWeekNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalWeekNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: e03447de-ba86-4992-9a5e-e3e5f7e7e959
+		summarizeBy: sum
+		sourceColumn: FiscalWeekNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYearStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 70aa5bb5-6a27-4c2b-9d7f-bcb622c593ef
+		summarizeBy: none
+		sourceColumn: FiscalYearStartDate
+
+		variation Variation
+			isDefault
+			relationship: 103382ab-6e6d-4508-80cf-6a05fa8dc827
+			defaultHierarchy: LocalDateTable_4ed6054b-47ec-4280-8397-6202985d82ab.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column FiscalYearEndDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0949f729-a28f-450c-aa60-8836e8ef9fdb
+		summarizeBy: none
+		sourceColumn: FiscalYearEndDate
+
+		variation Variation
+			isDefault
+			relationship: 86bb7293-f644-4e6f-8a5b-ee81ff7d5835
+			defaultHierarchy: LocalDateTable_95623359-38f0-49b2-badf-3155f0c6221a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column QuarterStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3d2c6655-255d-49e2-8048-c731ceb7de92
+		summarizeBy: none
+		sourceColumn: QuarterStartDate
+
+		variation Variation
+			isDefault
+			relationship: 4500a7c9-154e-4a9c-9a30-5ddde39d449b
+			defaultHierarchy: LocalDateTable_38759654-8862-4e64-bf0e-13491d457a88.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column QuarterEndDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: abdfc437-6c3f-485c-9b3d-272d6078e42b
+		summarizeBy: none
+		sourceColumn: QuarterEndDate
+
+		variation Variation
+			isDefault
+			relationship: dd511911-cb12-4eff-bd42-6361f1c92662
+			defaultHierarchy: LocalDateTable_b641268b-bc1b-4d3a-b771-04a9a57a2cca.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PeriodStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0e615855-1841-4366-a052-80cfea296a7d
+		summarizeBy: none
+		sourceColumn: PeriodStartDate
+
+		variation Variation
+			isDefault
+			relationship: 3e75c2a3-e4f1-4a24-861c-51041bf4759c
+			defaultHierarchy: LocalDateTable_8ef3722d-8667-44e0-b654-2fdda02f780f.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PeriodEndDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 72c0ab19-8a4b-425a-8135-e2743c8cd8ba
+		summarizeBy: none
+		sourceColumn: PeriodEndDate
+
+		variation Variation
+			isDefault
+			relationship: da11ebd7-e716-41de-9b36-c80680904154
+			defaultHierarchy: LocalDateTable_859605e3-270b-4af3-8105-e06d68cbb9a0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column WeekStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 65cf6c7a-2b0e-4b7f-a1fa-76f1f57d3380
+		summarizeBy: none
+		sourceColumn: WeekStartDate
+
+		variation Variation
+			isDefault
+			relationship: fedfb5a5-48d2-4a0c-a3e3-151da5c1bae6
+			defaultHierarchy: LocalDateTable_0fee50dd-f0b8-4cf5-ae93-4f1985dfc156.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column WeekEndDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c08167dd-7aab-41a9-be74-6b94617ae589
+		summarizeBy: none
+		sourceColumn: WeekEndDate
+
+		variation Variation
+			isDefault
+			relationship: 8d1a6c36-70da-4bb8-89c5-47b480f0e47f
+			defaultHierarchy: LocalDateTable_e1409e07-d606-49e4-9aad-e9e03431a5db.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PeriodLabel
+		dataType: string
+		lineageTag: 9ad13779-6503-489e-bd2e-218c77cc1789
+		summarizeBy: none
+		sourceColumn: PeriodLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekColumnLabel
+		dataType: string
+		lineageTag: 2fb9ab63-bc82-4292-8e78-5e3472a4ddde
+		summarizeBy: none
+		sourceColumn: WeekColumnLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekDateLabel
+		dataType: string
+		lineageTag: 18a97a4e-dfcd-4b12-b670-d2c672bcdad2
+		summarizeBy: none
+		sourceColumn: WeekDateLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekSort
+		dataType: int64
+		formatString: 0
+		lineageTag: 6266a188-89eb-437c-aa35-752f8d2e1ea3
+		summarizeBy: sum
+		sourceColumn: WeekSort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Fiscal Week' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("81reportal-sqlserver01-f28884e84e81bf38.database.windows.net", "reportaldb"),
+				    reportal_dimFiscalWeek_vw = Source{[Schema="reportal",Item="dimFiscalWeek_vw"]}[Data]
+				in
+				    reportal_dimFiscalWeek_vw
+

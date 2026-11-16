@@ -1,0 +1,223 @@
+table Metric
+	lineageTag: 918de526-4523-4cf8-a52a-a15801d892d3
+
+	column MetricKey
+		dataType: int64
+		formatString: 0
+		lineageTag: da0dfc22-f09b-4c24-b811-142e3532aa73
+		summarizeBy: none
+		sourceColumn: MetricKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column MetricName
+		dataType: string
+		lineageTag: 400578d3-e94c-4ee2-afe0-ebc26981d0fd
+		summarizeBy: none
+		sourceColumn: MetricName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MetricAbbreviation
+		dataType: string
+		lineageTag: 8e1b4f86-2409-49b5-bd25-2e1f51aeabd1
+		summarizeBy: none
+		sourceColumn: MetricAbbreviation
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentMetricKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 8c64cc50-5450-4704-8702-e006e8b9285c
+		summarizeBy: count
+		sourceColumn: ParentMetricKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentMetricName
+		dataType: string
+		lineageTag: 64179b44-1bc5-4bfd-9d29-2adc7c8581e5
+		summarizeBy: none
+		sourceColumn: ParentMetricName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MetricLevel
+		dataType: int64
+		formatString: 0
+		lineageTag: 640be7ab-298e-445e-9090-f80436cb2a3c
+		summarizeBy: sum
+		sourceColumn: MetricLevel
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: db0aa34b-4b08-4db0-bda4-62ba1bd0d3b4
+		summarizeBy: sum
+		sourceColumn: SortNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubSortNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: f7a85031-ffee-4ecc-851d-3bc3f3c18c28
+		summarizeBy: sum
+		sourceColumn: SubSortNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column LowThresholdText
+		dataType: string
+		lineageTag: 105bad5f-b1fe-4545-b735-36c4b3c0e33b
+		summarizeBy: none
+		sourceColumn: LowThresholdText
+
+		annotation SummarizationSetBy = Automatic
+
+	column HighThresholdText
+		dataType: string
+		lineageTag: c68b0b49-45e6-4bbb-94b2-3ce68afcfb74
+		summarizeBy: none
+		sourceColumn: HighThresholdText
+
+		annotation SummarizationSetBy = Automatic
+
+	column SummaryRoundingNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d70d28c-a6fd-46e0-af27-e643f21fa498
+		summarizeBy: sum
+		sourceColumn: SummaryRoundingNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column SummaryFormatMask
+		dataType: string
+		lineageTag: 2325a31f-ffb2-49bc-a39c-244eb247c985
+		summarizeBy: none
+		sourceColumn: SummaryFormatMask
+
+		annotation SummarizationSetBy = Automatic
+
+	column DetailRoundingNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: 9cdaa599-f8f3-4b46-a001-386c7e6dc197
+		summarizeBy: sum
+		sourceColumn: DetailRoundingNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column DetailFormatMask
+		dataType: string
+		lineageTag: 1e8c3dac-7d75-4743-855d-c86232a85f91
+		summarizeBy: none
+		sourceColumn: DetailFormatMask
+
+		annotation SummarizationSetBy = Automatic
+
+	column MetricDescription
+		dataType: string
+		lineageTag: 4d7c764d-6854-4abb-950c-547c8dd724c8
+		summarizeBy: none
+		sourceColumn: MetricDescription
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReferenceURL
+		dataType: string
+		lineageTag: 006ff1a5-5e12-477a-8827-93de0772bda7
+		summarizeBy: none
+		sourceColumn: ReferenceURL
+
+		annotation SummarizationSetBy = Automatic
+
+	column DetailViewOnlyFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 25cadf77-2be4-4733-adf7-5558a5d8ed3f
+		summarizeBy: none
+		sourceColumn: DetailViewOnlyFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column SummaryViewOnlyFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 0e3693a7-ba93-4198-8f14-7042ce8b249e
+		summarizeBy: none
+		sourceColumn: SummaryViewOnlyFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column HiddenFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 896e32ac-ce80-4047-a95a-42ee89ef0636
+		summarizeBy: none
+		sourceColumn: HiddenFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActiveFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6de7b1e5-b9ae-417b-924a-0ab0a9c903f9
+		summarizeBy: none
+		sourceColumn: ActiveFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentActiveFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f36906b2-3e0f-4233-85a8-fc08b28fbade
+		summarizeBy: none
+		sourceColumn: ParentActiveFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column DashboardVisibleFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 88f3f982-ab72-4974-b043-5924ae3e60cf
+		summarizeBy: none
+		sourceColumn: DashboardVisibleFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceModifiedBy
+		dataType: string
+		lineageTag: 3f91fbb3-3fac-4559-9017-95da65ea5480
+		summarizeBy: none
+		sourceColumn: SourceModifiedBy
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceModifiedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5925369f-4459-466e-b1a5-a7035a842fb6
+		summarizeBy: none
+		sourceColumn: SourceModifiedDateTime
+
+		variation Variation
+			isDefault
+			relationship: 3e9ad6c7-a49b-43a9-a0ee-c5d1b33e51f5
+			defaultHierarchy: LocalDateTable_3dfc1f5b-1d05-4aa6-aa21-c8ed6fd39213.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Metric = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("81reportal-sqlserver01-f28884e84e81bf38.database.windows.net", "reportaldb"),
+				    reportal_dimMetric_vw = Source{[Schema="reportal",Item="dimMetric_vw"]}[Data]
+				in
+				    reportal_dimMetric_vw
+
