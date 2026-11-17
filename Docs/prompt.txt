@@ -1,0 +1,575 @@
+You are working in an existing Power BI Project named:
+
+Reportal Dashboard.pbip
+
+Act as a senior Power BI developer experienced with:
+
+- PBIP projects
+- PBIR report definitions
+- TMDL semantic models
+- DAX
+- Power BI matrix and card visuals
+- source control
+- validating a replacement report against a legacy application
+
+PRIMARY OBJECTIVE
+
+Inspect the complete project and create a phased implementation plan for recreating the legacy Reportal Dashboard in Power BI.
+
+The legacy report reference image is:
+
+Docs/Screenshot Dashboard Period 10.png
+
+The final Power BI report must reproduce the data, structure, behavior, formatting, and visible Period 10 results in that image closely enough to validate the new report against the legacy report.
+
+This is a PLANNING task only.
+
+Do not modify any project files.
+Do not create measures.
+Do not create visuals.
+Do not delete local date tables.
+Do not rewrite TMDL or PBIR.
+Do not run destructive commands.
+
+FIRST: INSPECT THE COMPLETE PROJECT
+
+Inspect at least:
+
+1. Reportal Dashboard.pbip
+2. Reportal Dashboard.Report/definition.pbir
+3. Reportal Dashboard.Report/definition/report.json
+4. Reportal Dashboard.Report/definition/pages/pages.json
+5. Every existing page.json and visual definition
+6. Reportal Dashboard.SemanticModel/definition/model.tmdl
+7. Reportal Dashboard.SemanticModel/definition/relationships.tmdl
+8. Every business table TMDL file:
+   - Fiscal Period.tmdl
+   - Fiscal Week.tmdl
+   - Metric.tmdl
+   - Organization.tmdl
+   - Weekly Score.tmdl
+   - YTD Score.tmdl
+9. database.tmdl
+10. cultures/en-US.tmdl
+11. diagramLayout.json
+12. Docs/POWER_BI_REPORT_PLAYBOOK.md
+13. Docs/Screenshot Dashboard Period 10.png
+14. .gitignore
+15. The current Git status and recent commit history
+16. All generated DateTableTemplate_* and LocalDateTable_* TMDL files
+
+Treat the screenshot as the visual and data-validation specification.
+
+PROJECT MODEL INTENT
+
+Confirm the project currently implements this relationship structure:
+
+Fiscal Period[ FiscalPeriodKey ]
+    1 -> many
+Fiscal Week[ FiscalPeriodKey ]
+
+Fiscal Week[ FiscalWeekKey ]
+    1 -> many
+Weekly Score[ FiscalWeekKey ]
+
+Fiscal Week[ FiscalWeekKey ]
+    1 -> many
+YTD Score[ FiscalWeekKey ]
+
+Metric[ MetricKey ]
+    1 -> many
+Weekly Score[ MetricKey ]
+
+Metric[ MetricKey ]
+    1 -> many
+YTD Score[ MetricKey ]
+
+All relationships should be active, one-to-many, and single direction from dimension to fact.
+
+Organization is intentionally disconnected.
+
+Do not recommend connecting Organization directly to the fact tables unless project evidence proves the current design cannot work.
+
+ORGANIZATION FILTER DESIGN
+
+The database provides independently calculated results at these scopes:
+
+- ALL
+- Division
+- District
+- Site
+
+Power BI must not create Division, District, or enterprise scores by summing Site scores.
+
+The expected scope keys are conceptually:
+
+ALL
+DIV|011
+DIST|011|P2
+SITE|011|P2|350
+
+The Organization table supplies cascading report filters:
+
+Division
+District
+Site
+
+Each filter allows Select All or one value.
+
+The implementation plan must include DAX that converts the disconnected Organization selections into the exact OrganizationScopeKey required by both fact tables.
+
+DATABASE-SUPPLIED RESULTS
+
+The database already supplies:
+
+- Total Overall
+- Care
+- Service
+- Share
+- detail metric rows
+- YTD values
+- weekly values
+- scores
+- display values
+- goals
+- status colors
+- arrows where available
+- metric order and hierarchy metadata
+
+Power BI must not sum or recalculate Total Overall, Care, Service, Share, or the supplied metric scores.
+
+Matrix subtotals must not replace the database-supplied group rows.
+
+LEGACY REPORT ELEMENTS TO IDENTIFY
+
+Carefully inspect the screenshot and document the expected implementation of:
+
+1. YTD Total Score at the upper left
+2. Change badge beside the total score
+3. Care score ring and change badge
+4. Service score ring and change badge
+5. Share score ring and change badge
+6. Previous-period arrow
+7. “Period 10 2026” label
+8. Next-period arrow
+9. Year-to-Date section
+10. Goal column
+11. P10 W1 (W37)
+12. P10 W2 (W38)
+13. P10 W3 (W39)
+14. P10 W4 (W40)
+15. Week date-range labels
+16. Total Overall row
+17. Care group and its detail rows
+18. Service group and its detail rows
+19. Share group and its detail rows
+20. Cells that display both a colored score and an underlying value
+21. Rows that display only an underlying value
+22. Information icons or tooltips
+23. Conditional colors
+24. Number formatting for percentages, whole numbers, and millions
+25. Divider lines, spacing, typography, and backgrounds
+
+PERIOD 10 VALIDATION TARGET
+
+The plan must include validation against these known database-supplied weekly results:
+
+Total Overall:
+- W37 = 64
+- W38 = 65
+- W39 = 66
+- W40 = 65
+
+Care:
+- W37 = 66
+- W38 = 69
+- W39 = 70
+- W40 = 69
+
+Service:
+- W37 = 86
+- W38 = 86
+- W39 = 87
+- W40 = 87
+
+Share:
+- W37 = 45
+- W38 = 45
+- W39 = 45
+- W40 = 44
+
+The plan must also validate representative display patterns:
+
+Auto Refill:
+- score plus percentage
+- Period 10 score = 94 for all four weeks
+- underlying values display at approximately 61.2%, 61.2%, 61.1%, and 61.1%
+
+Completed Clinical Interactions:
+- underlying count without a score
+- Period 10 weekly counts = 13,853; 15,165; 16,263; 15,062
+
+Rx Sold:
+- score plus volume formatted in millions
+- scores = 90, 90, 90, 88
+- values approximately 6.79M, 6.75M, 6.79M, 6.93M
+
+The plan must also include validation of:
+
+- YTD Total Score = 65
+- Care YTD = 72
+- Service YTD = 83
+- Share YTD = 45
+
+INSPECTION REQUIREMENTS
+
+A. Semantic model assessment
+
+Document:
+
+- tables
+- columns
+- data types
+- partitions and source views
+- current relationships
+- relationship directions
+- measures
+- calculated columns
+- hidden fields
+- sort-by-column properties
+- display folders
+- format strings
+- data categories
+- table storage modes
+- annotations
+- generated local date tables
+- potential ambiguity or duplicate-filter paths
+
+Specifically assess whether Auto date/time appears enabled, based on the DateTableTemplate_* and LocalDateTable_* files.
+
+Recommend a safe cleanup approach, but do not implement it.
+
+B. Data-grain assessment
+
+Confirm whether project definitions support these grains:
+
+Weekly Score:
+Organization scope x Fiscal week x Metric
+
+YTD Score:
+Organization scope x YTD endpoint fiscal week x Metric
+
+Confirm that score, display value, underlying value, goal, color, and arrow fields remain separate.
+
+C. Report assessment
+
+Document:
+
+- current report pages
+- current page names and dimensions
+- current visuals
+- report theme
+- existing resources
+- whether the report page is blank
+- PBIR format and schema
+- whether the current report can be safely extended
+
+D. Legacy screenshot assessment
+
+Create a concise element-by-element inventory of the reference screenshot.
+
+Distinguish:
+
+- visible fact
+- supported inference
+- open question
+
+Do not invent behavior that cannot be established from the image or project.
+
+REQUIRED OUTPUT: PHASED IMPLEMENTATION PLAN
+
+Produce a practical plan divided into gated phases.
+
+Use this minimum phase structure:
+
+PHASE 0 — Baseline and source-control protection
+
+Include:
+
+- verify clean Git status
+- create or confirm a baseline commit
+- confirm Power BI Desktop is closed before external edits
+- identify files expected to change
+- establish rollback procedure
+
+Exit checklist:
+- [ ] Working tree is clean
+- [ ] Baseline commit exists
+- [ ] PBIP opens successfully before modifications
+- [ ] Source screenshot and playbook are available
+- [ ] Current relationships are documented
+
+Do not proceed recommendation:
+State clearly that implementation should not proceed until every required item is checked.
+
+PHASE 1 — Semantic-model cleanup
+
+Plan:
+
+- remove or prevent unnecessary Auto date/time tables safely
+- hide technical keys and source metadata not needed by report authors
+- preserve fields needed by DAX and PBIR
+- configure sort-by-column properties
+- configure metric ordering
+- configure period/week ordering
+- use business-friendly descriptions
+- preserve source data types
+- create a dedicated measure table only if justified
+
+Include a checklist that must pass before Phase 2.
+
+PHASE 2 — Organization-scope logic
+
+Plan the measures required to interpret:
+
+- Division All or one
+- District All or one
+- Site All or one
+
+Define expected mapping to:
+
+- ALL
+- DIV
+- DIST
+- SITE scope keys
+
+Specify behavior for invalid, ambiguous, or conflicting filter selections.
+
+Require test cases for:
+
+- All / All / All
+- one Division / all Districts / all Sites
+- one Division / one District / all Sites
+- one Division / one District / one Site
+
+Include a checklist that must pass before Phase 3.
+
+PHASE 3 — Base retrieval measures
+
+Plan the minimum measures for:
+
+- YTD score
+- YTD display value
+- YTD goal
+- YTD color
+- weekly score
+- weekly display value
+- weekly goal
+- weekly color
+- weekly arrow
+- selected period label
+- week labels and date labels
+
+The measures must retrieve supplied rows and not aggregate unrelated metrics.
+
+Include handling for blank score values where only DisplayValue should appear.
+
+Include a checklist that must pass before Phase 4.
+
+PHASE 4 — Semantic-model data validation
+
+Plan a temporary validation page or DAX-query approach that verifies:
+
+- Period 10 / ALL
+- headline YTD scores
+- group YTD scores
+- W37-W40 group scores
+- Auto Refill
+- Completed Clinical Interactions
+- Rx Sold
+- at least one percentage metric
+- at least one lower-performing red metric
+- GoalText formatting
+- color retrieval
+- metric order
+
+Specify an exact comparison table with:
+
+Legacy expected
+Power BI actual
+Difference
+Pass/Fail
+
+Use exact equality for whole-number scores and counts.
+
+For floating-point percentages, define a tolerance before formatting, such as absolute difference <= 0.000001 where source precision permits.
+
+Include a checklist that must pass before any final visual recreation begins.
+
+PHASE 5 — Report shell
+
+Plan:
+
+- report page size
+- page background
+- left filter panel
+- Division slicer
+- District slicer
+- Site slicer
+- Select All or one behavior
+- Period navigation area
+- help/information button placeholder
+- visual naming conventions
+- tab order and accessibility names
+
+Do not bind final score visuals until Phase 4 passes.
+
+Include a checklist that must pass before Phase 6.
+
+PHASE 6 — Header score visuals
+
+Plan the Total Overall, Care, Service, and Share displays.
+
+Include:
+
+- supplied score
+- supplied color
+- change badge
+- ring styling
+- responsive filter behavior
+- tooltip content
+- handling blanks or unavailable data
+
+Include a visual and data-verification checklist.
+
+PHASE 7 — Main score matrix
+
+Plan how to reproduce:
+
+- YTD score and underlying value
+- Goal
+- four or five dynamic period weeks
+- score plus underlying display value in the same logical cell
+- database-supplied Total Overall and group rows
+- detail-row indentation
+- metric ordering
+- mixed formats
+- conditional colors
+- hidden color behavior
+- no calculated subtotals
+
+Compare implementation alternatives, including:
+
+1. native Matrix
+2. coordinated matrices
+3. field parameter or calculation group
+4. another standard Power BI approach
+
+Recommend the least complex standard approach that can reproduce the screenshot reliably.
+
+Do not recommend a custom visual unless standard Power BI visuals cannot meet a confirmed requirement.
+
+Include a checklist that must pass before Phase 8.
+
+PHASE 8 — Period navigation
+
+Plan how to implement:
+
+< Period 10 2026 >
+
+The displayed period must control the Fiscal Period selection and update the four/five week columns.
+
+Evaluate:
+
+- standard single-select slicer
+- button/bookmark approach
+- field parameter
+- disconnected navigation table
+- another supported PBIR solution
+
+Explain trade-offs and recommend the safest implementation.
+
+Include tests for:
+
+- previous period
+- next period
+- first available period
+- latest available period
+- four-week period
+- five-week period, if present in the calendar
+
+PHASE 9 — Visual comparison and refinement
+
+Plan a side-by-side comparison against:
+
+Docs/Screenshot Dashboard Period 10.png
+
+Include checks for:
+
+- values
+- labels
+- row order
+- week order
+- number formats
+- colors
+- alignment
+- spacing
+- borders
+- typography
+- filter behavior
+- page size
+- period navigation
+
+Require screenshots or documented evidence of the Power BI result.
+
+PHASE 10 — Final validation and release readiness
+
+Include:
+
+- Power BI Desktop open/save test
+- refresh test
+- no broken TMDL or PBIR references
+- no duplicate object IDs
+- Git diff review
+- performance review
+- accessibility review
+- validation at ALL, Division, District, and Site scopes
+- publish/deployment considerations
+- rollback and version tag
+
+FOR EVERY PHASE
+
+Provide:
+
+1. Objective
+2. Files likely to change
+3. Specific implementation tasks
+4. Risks and common failure modes
+5. Verification procedure
+6. Checklist
+7. Explicit exit criteria
+8. Recommended Git commit message
+
+The plan must require stopping at each gate until the checklist passes.
+
+FINAL DELIVERABLE FORMAT
+
+Return:
+
+1. Executive assessment
+2. Current project inventory
+3. Semantic-model findings
+4. Report/PBIR findings
+5. Legacy screenshot inventory
+6. Risks and open questions
+7. Phased gated implementation plan
+8. Phase-by-phase checklists
+9. Recommended first implementation phase
+10. Files expected to change in that first phase
+11. Questions that must be answered before implementation
+
+Do not make changes during this response.
+
+Do not provide generic Power BI advice.
+
+Base all recommendations on the actual PBIP, PBIR, TMDL, documentation, and legacy screenshot found in this project.

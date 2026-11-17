@@ -1,0 +1,35 @@
+Here is the simplified development sequence. The main principle is do not proceed to the next phase until the current phase validates successfully.
+
+Phase	Focus	Main outcome0. Baseline	Git and project safety	Clean baseline/commit and confirmed working PBIP
+1. Model cleanup	TMDL/model configuration	Clean fields, sorting, formats, remove unnecessary auto date tables
+2. Organization filters	Division → District → Site	Correct disconnected-filter logic resolving to ALL, DIV, DIST, or SITE
+3. DAX measures	Retrieve supplied database values	YTD, Weekly, Goal, Color, Arrow, Period/Week measures
+4. Data validation	Compare Power BI with Reportal	Period 10 numbers match the legacy dashboard
+5. Report shell	Basic page/layout	Filter panel, period area, page structure, help button
+6. Score cards	Top KPIs	Total Overall, Care, Service, Share match legacy
+7. Main matrix	Detailed scorecard	YTD + Goal + weekly columns and detail rows
+8. Period navigation	< Period 10 2026 >	Previous/next period behavior works correctly
+9. Visual refinement	Match legacy appearance	Colors, spacing, formatting, labels, alignment
+10. Final validation	Full regression	Data, filters, visuals, refresh, performance and Git all validated
+Most important checkpoint
+
+Phase 4 is the major gate.
+
+Before spending much time recreating the legacy appearance, Power BI should reproduce:
+
+                    P10 W1   P10 W2   P10 W3   P10 W4
+Total Overall         64       65       66       65
+Care                  66       69       70       69
+Service               86       86       87       87
+Share                 45       45       45       44
+
+YTD:
+Total Overall = 65
+Care          = 72
+Service       = 83
+Share         = 45
+
+
+Also verify representative detail metrics such as Auto Refill, Completed Clinical Interactions, and Rx Sold.
+
+Once those values match, the project moves from proving the semantic model to recreating the Reportal user interface.
