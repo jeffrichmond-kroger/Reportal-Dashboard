@@ -1,0 +1,19 @@
+[MetricKey]	[MetricName]	[SortNumber]	[SummaryFormatMask]	[SummaryRoundingNumber]	[DetailFormatMask]	[DetailRoundingNumber]	[LowThresholdText]	[HighThresholdText]	[MetricDescription]
+17	Total Overall	10000		0					
+3	Care	20000		0					Connections with our customers on an emotional and personal level that measure the first-class encounters we provide.
+89	Left Nav Clinical Impact [NS]	20300	%	1	0	1			Left Nav
+88	PEQ Clinical Impact	20400	%	1	0	1			PEQ Clinical Impact is the result of PEQ % Engaged Result multiplied by PEQ % Success Result.
+90	Completed Clinical Interactions [NS]	20500	0		0				Sum of all completed PEQ tasks (accepted, refused, invalid, UTR) and closed Left Nav Tasks.
+87	Auto Refill	20600	%	1	0	1			Percentage of eligible prescriptions enrolled in Auto Refill
+38	90-day	20700	%	2	%	2			The percentage of 90-day prescriptions (day supply = 84 or greater) filled as measured against all the prescriptions filled during the measurement period
+21	Return to Stock	20800	%	2	%	2			The number of "Ready" prescriptions returned to stock or canceled as measured against all prescriptions filled during the measure period
+2	Service	30000		0					Solutions used to simplify healthcare that measure the results of our daily operations and execution.
+19	Pharmacist PE	30100	%	2	%	2			Pharmacist percent effective (PE) is a measurement of the ELMS labor hours actually used divided by ELMS labor hours earned during the measurement period
+20	Technician PE	30200	%	1	%	2			Technician percent effective (PE) is a measurement of the ELMS labor hours actually used divided by ELMS labor hours earned during the measurement period
+45	Overall Satisfaction	30300	%	0	%	0			[NS=NOT SCORED and result does not impact Reportal scoring] The total number of satisfied customer comments as compared to total number of comments. 30 total customer comments are needed in a measurement period to produce a measurable result.
+7	Ready Rate	30400	%	2	%	2			The percentage of prescriptions filled that achieved 'Ready' status by the 'Ready When Promised' time as measured against all completed prescriptions filled during the measurement period
+51	Automation	30500	%	2	%	2			Result is the total number of FILLED prescriptions using automation (Central Fill or Parata) within the pharmacy as compared to your goal.
+4	Share	40000		0					Standards of excellence that measure the healthcare product we provide our patients to help them live healthier lives.
+12	Rx Sold	40100	0	0	0				The number of prescriptions (adjusted for 90-day supplies) that were sold during the measurement Period
+39	Vaccines	40200	0		0	0			The number of vaccines, everyday or flu, provided to patients (sold) during the measurement 
+period

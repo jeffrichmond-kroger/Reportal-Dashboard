@@ -1,6 +1,22 @@
 table 'Fiscal Week'
 	lineageTag: 0723c252-5399-445c-b613-4e1b961cb3fb
 
+	measure 'Selected Week Label' =
+			IF (
+				HASONEVALUE ( 'Fiscal Week'[FiscalWeekKey] ),
+				SELECTEDVALUE ( 'Fiscal Week'[WeekColumnLabel] )
+			)
+		displayFolder: Week Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309041
+
+	measure 'Selected Week Date Label' =
+			IF (
+				HASONEVALUE ( 'Fiscal Week'[FiscalWeekKey] ),
+				SELECTEDVALUE ( 'Fiscal Week'[WeekDateLabel] )
+			)
+		displayFolder: Week Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309042
+
 	column FiscalWeekKey
 		dataType: int64
 		isHidden

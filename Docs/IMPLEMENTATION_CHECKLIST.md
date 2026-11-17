@@ -24,7 +24,7 @@ before final visual recreation. Do not mark a phase complete based only on edits
 - [x] Phase 0: baseline and project safety established before implementation.
 - [x] Phase 1: semantic-model cleanup (user accepted 2026-11-17).
 - [x] Phase 2: organization-scope logic (runtime gate passed 2026-11-17).
-- [ ] Phase 3: base retrieval measures (source endpoint/format profiling in progress).
+- [x] Phase 3: base retrieval measures (runtime gate passed 2026-11-17).
 - [ ] Phase 4: semantic-model data validation (major gate).
 - [ ] Phase 5: report shell.
 - [ ] Phase 6: header score visuals.
@@ -191,20 +191,26 @@ table is required solely for this weekly, supplied-result retrieval design.
 
 ## Phase 3: Base Retrieval Measures
 
-- [x] Prepare read-only source profiling queries; loaded results pending.
-- [ ] Define and verify the selected-period YTD endpoint rule.
-- [ ] Retrieve YTD score, display value, goal, and color from supplied rows.
-- [ ] Retrieve weekly score, display value, goal text, color, and arrow.
-- [ ] Add selected period, week, and date labels.
-- [ ] Require one metric, one scope, and one applicable time endpoint per result.
-- [ ] Detect duplicate rows rather than masking them with MAX or SELECTEDVALUE.
-- [ ] Retain display-only results when ScoreValue is blank; preserve valid zero.
-- [ ] Compile and evaluate DAX in Desktop before Phase 4.
+- [x] Prepare source profiling queries and review Q1-Q4 loaded results.
+- [x] Define YTD endpoint from source evidence; confirm measure evaluation in Q5/Q6.
+- [x] Implement retrieval of YTD score, display value, underlying value, goal, and color.
+- [x] Implement retrieval of weekly score, display value, underlying value, goal text, color, and arrow.
+- [x] Add selected period, week, and date labels.
+- [x] Guard retrieval by one metric, one resolved scope, and an applicable single time endpoint.
+- [x] Add row-count diagnostics and require exactly one row before value retrieval.
+- [x] Preserve blank scores, independent display values, and valid zero in measure logic.
+- [x] Add literal-percent, count, and Rx Sold million display-text formatting.
+- [x] Confirm Q5/Q6 retrieval and formatting match the exported source rows.
+- [x] Confirm Q7 blank-context guards pass.
+- [x] Compile and evaluate DAX in Desktop before Phase 4.
+- [x] Confirm corrected Q5 emits exactly the 28 intended metric/week groups.
 
 ### Phase 3 Source Profiling Gate
 
-Run the four EVALUATE blocks in [PHASE_3_VALIDATION.dax](PHASE_3_VALIDATION.dax)
-and retain outputs as PHASE_3_Q1.txt through PHASE_3_Q4.txt in Docs.
+The first four EVALUATE blocks in [PHASE_3_VALIDATION.dax](PHASE_3_VALIDATION.dax)
+were evaluated by the user. Source evidence is retained in
+[PHASE_3_Q1.txt](PHASE_3_Q1.txt), [PHASE_3_Q2.txt](PHASE_3_Q2.txt),
+[PHASE_3_Q3.txt](PHASE_3_Q3.txt), and [PHASE_3_Q4.txt](PHASE_3_Q4.txt).
 Each block is independently runnable; no DEFINE section is required.
 
 1. Q1: Period 10 2026 / ALL raw YTD rows for the four headline metrics, Auto
@@ -218,12 +224,87 @@ Each block is independently runnable; no DEFINE section is required.
   Require nonzero source rows and zero duplicate grains. This scoped check does
   not establish uniqueness across all organizations or periods.
 
-These are raw-row/metadata diagnostics, not score aggregation or final Phase 4
-comparisons. No retrieval measure has yet selected an assumed YTD endpoint.
-If Q1 has multiple snapshots, establish the business endpoint before retrieving
-a single one; never average or sum them. If rows are missing, investigate before
-introducing fallbacks. Source availability and current-period cutoff rules must
-be distinguished from the maximum week present in the fiscal calendar.
+### Phase 3 Source Findings And Retrieval Contract
+
+- Q4: Period 10 / ALL has 156 weekly rows and 144 YTD rows, each with zero
+  duplicate grains and four endpoint weeks. This is scoped evidence, not proof
+  of global uniqueness across all organizations and periods.
+- Q1: four independent YTD snapshots exist at 202637-202640. At endpoint 202640,
+  Total Overall/Care/Service/Share scores are 65/72/83/45.
+- Selected YTD Endpoint Week Key chooses the maximum available YTD FiscalWeekKey
+  within the explicitly selected period and resolved scope, independent of the
+  metric and weekly column. This is a key lookup, never aggregation of scores.
+  It does not choose a different endpoint per metric or fall back to another
+  period. Missing metrics at the common endpoint remain blank. Future periods
+  without snapshots remain blank rather than silently showing an earlier period.
+- Each value measure requires exactly one matching source row. Row-count helpers
+  return 0 for missing valid contexts, >1 for duplicates, and blank for invalid
+  contexts; value measures return blank unless the count is exactly 1.
+- Weekly retrieval requires one fiscal week and one metric. YTD retrieval requires
+  one selected Fiscal Period and one metric; weekly filters are removed for YTD.
+- No default period is silently selected. Selected Period Label is blank unless
+  exactly one Fiscal Period is in context. Navigation must set an actual selection.
+- Q2: weekly headline targets and the three representative detail patterns match
+  the legacy expectations in the raw rows. Q5 confirms actual measure retrieval
+  for all 28 intended metric/week rows.
+- Auto Refill DisplayValue is approximately 61.2 percentage points, not 0.612.
+  SummaryFormatMask is a source indicator (%, 0, or blank), not a ready-to-use
+  DAX format string. Display text uses SummaryRoundingNumber and a literal percent
+  suffix; it never applies DAX percent scaling. Numeric source measures stay raw.
+- DetailFormatMask is preserved for future detail views; it does not override the
+  dashboard summary format. Raw UnderlyingValue is not substituted for DisplayValue.
+- Rx Sold display and numeric YTD goal use two-decimal millions when magnitude is
+  at least one million; smaller organizational values remain grouped numbers.
+  Count-only Clinical Interactions uses grouped integers with no invented score.
+- Weekly GoalText remains byte-for-byte source text. Blank YTD GoalValue remains
+  blank, even when the weekly row has a goal. Several sampled YTD goals are blank,
+  including Auto Refill; assess any legacy Goal-column discrepancy during Phase 4
+  rather than silently substituting a weekly goal.
+- ColorCode (red/yellow/green in sampled rows) and ArrowCode (up/down/side) are
+  retrieved unchanged. No thresholds, statuses, or arrows are recalculated.
+- Measures are housed in their existing owning tables using display folders;
+  Metric Numeric Format is a hidden formatting helper. No measure table, source
+  query changes, relationship changes, or report visuals are required.
+
+### Phase 3 Runtime Findings And Acceptance
+
+Desktop results were reviewed on 2026-11-17:
+[PHASE_3_Q5.txt](PHASE_3_Q5.txt), [PHASE_3_Q6.txt](PHASE_3_Q6.txt), and
+[PHASE_3_Q7.txt](PHASE_3_Q7.txt). These establish actual DAX evaluation, not just
+static reference checks.
+
+1. Q5: all 28 intended Period 10 metric/week rows have Weekly rows=1 and exactly
+  match Q2 scores, display values, underlying values, goal text, colors, and
+  arrows. Week labels match the grouped source labels. Auto Refill, Rx Sold,
+  and Clinical Interactions display text matches the expected patterns.
+  Endpoint 202640 and each metric's YTD score remain constant across weeks.
+2. Q6: seven rows have YTD rows=1, scope ALL, period label Period 10 2026, and
+  endpoint 202640. All five retrieved raw fields match Q1's endpoint rows.
+  Headline scores are 65/72/83/45. Clinical Interactions retains a blank score
+  and display 459,526. Rx Sold displays 248.24M with goal 232.72M; Auto Refill
+  displays 61.2%. Blank goals and colors remain blank.
+3. Q7: all six invalid/ambiguous-context guards return blank and PASS.
+
+The original Q5 emitted 3,290 groups, including 3,262 unrelated calendar groups
+with blank weekly fields. SUMMARIZECOLUMNS grouping is not constrained by the
+related Fiscal Period filter under SelfValue semantics; nonblank scope/YTD
+expressions keep the extra groups in the output. This is a validation-query
+grouping defect, not incorrect weekly retrieval. Query 5 now also filters
+Fiscal Week[FiscalPeriodKey] directly. No model changes were needed.
+
+The user reran corrected EVALUATE block 5 in
+[PHASE_3_VALIDATION.dax](PHASE_3_VALIDATION.dax) and updated
+[PHASE_3_Q5.txt](PHASE_3_Q5.txt). The 2026-11-17 rerun contains exactly 28 unique
+groups: seven metrics across weeks 202637-202640, all at scope ALL and with
+Weekly rows=1. All 168 source-field comparisons match Q2; display text and
+week/date labels match expectations. YTD endpoint 202640 and each metric's YTD
+score remain unchanged across all four weekly columns. The grouping defect is
+resolved in Desktop. The passing Q6/Q7 evidence remains applicable.
+
+Phase 3 runtime gate passed on 2026-11-17. Phase 4 remains the formal exact
+comparison gate, including broader metric coverage, fact uniqueness,
+missing-row behavior, goal discrepancies, and organization regressions. This
+acceptance does not authorize final visual recreation before Phase 4 passes.
 
 ## Phase 4: Data Validation
 

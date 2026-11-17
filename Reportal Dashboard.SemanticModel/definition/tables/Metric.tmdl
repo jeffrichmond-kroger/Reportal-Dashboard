@@ -1,6 +1,17 @@
 table Metric
 	lineageTag: 918de526-4523-4cf8-a52a-a15801d892d3
 
+	measure 'Metric Numeric Format' =
+			VAR DecimalPlaces = COALESCE ( SELECTEDVALUE ( Metric[SummaryRoundingNumber] ), 0 )
+			RETURN
+				IF (
+					HASONEVALUE ( Metric[MetricKey] ),
+					"#,0" & IF ( DecimalPlaces > 0, "." & REPT ( "0", DecimalPlaces ), "" )
+				)
+		isHidden
+		displayFolder: Formatting
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309040
+
 	column MetricKey
 		dataType: int64
 		isHidden

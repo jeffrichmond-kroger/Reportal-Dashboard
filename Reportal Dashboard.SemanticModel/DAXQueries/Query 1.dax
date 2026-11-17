@@ -1,221 +1,27 @@
-DEFINE
-    VAR CandidateSites =
-        FILTER (
-            ALL ( Organization ),
-            LEN ( Organization[DivisionNumber] ) > 0
-                && LEN ( Organization[DistrictNumber] ) > 0
-                && LEN ( Organization[SiteNumber] ) > 0
-                && LEN ( Organization[OrganizationSiteKey] ) > 0
-                && LEN ( Organization[DivisionDisplay] ) > 0
-                && LEN ( Organization[DistrictDisplay] ) > 0
-                && LEN ( Organization[SiteDisplay] ) > 0
-        )
-    VAR SampleSite =
-        TOPN (
-            1,
-            CandidateSites,
-            Organization[DivisionNumber], ASC,
-            Organization[DistrictNumber], ASC,
-            Organization[SiteNumber], ASC,
-            Organization[OrganizationSiteKey], ASC
-        )
-    VAR SampleDivision = MAXX ( SampleSite, Organization[DivisionNumber] )
-    VAR SampleDistrict = MAXX ( SampleSite, Organization[DistrictNumber] )
-    VAR SampleSiteNumber = MAXX ( SampleSite, Organization[SiteNumber] )
-    VAR SampleSiteKey = MAXX ( SampleSite, Organization[OrganizationSiteKey] )
-    VAR SampleDivisionDisplay = MAXX ( SampleSite, Organization[DivisionDisplay] )
-    VAR SampleDistrictDisplay = MAXX ( SampleSite, Organization[DistrictDisplay] )
-    VAR SampleSiteDisplay = MAXX ( SampleSite, Organization[SiteDisplay] )
-    VAR ExpectedDivision = "DIV|" & SampleDivision
-    VAR ExpectedDistrict = "DIST|" & SampleDivision & "|" & SampleDistrict
-    VAR ExpectedSiteKey = "SITE|" & SampleDivision & "|" & SampleDistrict & "|" & SampleSiteNumber
-    VAR ConflictingDivision =
-        TOPN (
-            1,
-            FILTER (
-                ALL ( Organization[DivisionNumber] ),
-                LEN ( Organization[DivisionNumber] ) > 0
-                    && Organization[DivisionNumber] <> SampleDivision
-            ),
-            Organization[DivisionNumber], ASC
-        )
-    VAR TwoDivisions =
-        TOPN (
-            2,
-            FILTER ( ALL ( Organization[DivisionNumber] ), LEN ( Organization[DivisionNumber] ) > 0 ),
-            Organization[DivisionNumber], ASC
-        )
-    VAR TwoSites =
-        TOPN (
-            2,
-            FILTER ( ALL ( Organization[SiteDisplay] ), LEN ( Organization[SiteDisplay] ) > 0 ),
-            Organization[SiteDisplay], ASC
-        )
-    VAR TestResults =
-        UNION (
-            ROW (
-                "Test", "01 ALL: all organization filters cleared",
-                "Expected", "ALL",
-                "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ) ),
-                "Applicable", TRUE ()
-            ),
-            ROW (
-                "Test", "02 DIV: one division number, children unfiltered",
-                "Expected", ExpectedDivision,
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleDivision }, Organization[DivisionNumber] )
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) )
-            ),
-            ROW (
-                "Test", "03 DIST: one division/district number, sites unfiltered",
-                "Expected", ExpectedDistrict,
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleDivision }, Organization[DivisionNumber] ),
-                        TREATAS ( { SampleDistrict }, Organization[DistrictNumber] )
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) )
-            ),
-            ROW (
-                "Test", "04 SITE: one division/district/site number",
-                "Expected", ExpectedSiteKey,
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleDivision }, Organization[DivisionNumber] ),
-                        TREATAS ( { SampleDistrict }, Organization[DistrictNumber] ),
-                        TREATAS ( { SampleSiteNumber }, Organization[SiteNumber] )
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) )
-            ),
-            ROW (
-                "Test", "05 DIV: display slicer, children unfiltered",
-                "Expected", ExpectedDivision,
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleDivisionDisplay }, Organization[DivisionDisplay] )
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) )
-            ),
-            ROW (
-                "Test", "06 DIST: display slicers",
-                "Expected", ExpectedDistrict,
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleDivisionDisplay }, Organization[DivisionDisplay] ),
-                        TREATAS ( { SampleDistrictDisplay }, Organization[DistrictDisplay] )
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) )
-            ),
-            ROW (
-                "Test", "07 SITE: display slicers",
-                "Expected", ExpectedSiteKey,
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleDivisionDisplay }, Organization[DivisionDisplay] ),
-                        TREATAS ( { SampleDistrictDisplay }, Organization[DistrictDisplay] ),
-                        TREATAS ( { SampleSiteDisplay }, Organization[SiteDisplay] )
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) )
-            ),
-            ROW (
-                "Test", "08 SITE: unique site key with inferred parents",
-                "Expected", ExpectedSiteKey,
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleSiteKey }, Organization[OrganizationSiteKey] )
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) )
-            ),
-            ROW (
-                "Test", "09 Invalid organization key returns blank",
-                "Expected", BLANK (),
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        FILTER ( ALL ( Organization[OrganizationSiteKey] ), FALSE () )
-                    ),
-                "Applicable", TRUE ()
-            ),
-            ROW (
-                "Test", "10 Conflicting valid site and different division return blank",
-                "Expected", BLANK (),
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TREATAS ( { SampleSiteKey }, Organization[OrganizationSiteKey] ),
-                        ConflictingDivision
-                    ),
-                "Applicable", NOT ( ISEMPTY ( SampleSite ) ) && COUNTROWS ( ConflictingDivision ) = 1
-            ),
-            ROW (
-                "Test", "11 Multiple divisions return blank",
-                "Expected", BLANK (),
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TwoDivisions
-                    ),
-                "Applicable", COUNTROWS ( TwoDivisions ) = 2
-            ),
-            ROW (
-                "Test", "12 Multiple site displays return blank",
-                "Expected", BLANK (),
-                "Actual",
-                    CALCULATE (
-                        [Selected Organization Scope Key],
-                        REMOVEFILTERS ( Organization ),
-                        TwoSites
-                    ),
-                "Applicable", COUNTROWS ( TwoSites ) = 2
-            )
-        )
 EVALUATE
-ADDCOLUMNS (
-    TestResults,
-    "Pass/Fail", IF ( NOT ( [Applicable] ), "NOT TESTED", IF ( [Expected] == [Actual], "PASS", "FAIL" ) ),
-    "Weekly key exists",
-        VAR ScopeKey = [Actual]
-        RETURN
-            IF (
-                [Applicable] && NOT ( ISBLANK ( ScopeKey ) ),
-                CONTAINS ( ALL ( 'Weekly Score'[OrganizationScopeKey] ), 'Weekly Score'[OrganizationScopeKey], ScopeKey )
-            ),
-    "YTD key exists",
-        VAR ScopeKey = [Actual]
-        RETURN
-            IF (
-                [Applicable] && NOT ( ISBLANK ( ScopeKey ) ),
-                CONTAINS ( ALL ( 'YTD Score'[OrganizationScopeKey] ), 'YTD Score'[OrganizationScopeKey], ScopeKey )
-            )
+CALCULATETABLE (
+    SUMMARIZECOLUMNS (
+        Metric[MetricKey],
+        Metric[MetricName],
+        'Fiscal Week'[FiscalWeekKey],
+        'Fiscal Week'[WeekColumnLabel],
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        TREATAS ( { 202610 }, 'Fiscal Week'[FiscalPeriodKey] ),
+        TREATAS ( { 17, 3, 2, 4, 87, 90, 12 }, Metric[MetricKey] ),
+        "Scope", [Selected Organization Scope Key],
+        "Week label", [Selected Week Label],
+        "Week date label", [Selected Week Date Label],
+        "Weekly rows", [Weekly Result Row Count],
+        "Weekly score", [Weekly Score Value],
+        "Weekly display value", [Weekly Display Value],
+        "Weekly display text", [Weekly Display Text],
+        "Weekly underlying value", [Weekly Underlying Value],
+        "Weekly goal text", [Weekly Goal Text],
+        "Weekly color", [Weekly Color],
+        "Weekly arrow", [Weekly Arrow],
+        "YTD endpoint", [Selected YTD Endpoint Week Key],
+        "YTD score under week filter", [YTD Score Value]
+    ),
+    REMOVEFILTERS ( Organization )
 )
-ORDER BY [Test]
-
-EVALUATE
-SUMMARIZECOLUMNS (
-    Organization[DivisionDisplay],
-    Organization[DivisionNumber],
-    "Expected", "DIV|" & SELECTEDVALUE ( Organization[DivisionNumber] ),
-    "Actual", [Selected Organization Scope Key],
-    "District count", DISTINCTCOUNT ( Organization[DistrictNumber] ),
-    "Site count", DISTINCTCOUNT ( Organization[OrganizationSiteKey] )
-)
-ORDER BY Organization[DivisionNumber]
+ORDER BY 'Fiscal Week'[FiscalWeekKey], Metric[MetricKey]

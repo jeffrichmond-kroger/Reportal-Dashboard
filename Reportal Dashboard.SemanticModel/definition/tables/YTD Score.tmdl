@@ -1,6 +1,151 @@
 table 'YTD Score'
 	lineageTag: 3867720a-f613-43dd-9bc1-d45ce96843df
 
+	measure 'YTD Display Text' =
+			VAR RawDisplay = [YTD Display Value]
+			VAR SourceMask = SELECTEDVALUE ( Metric[SummaryFormatMask] )
+			VAR NumberPattern = [Metric Numeric Format]
+			RETURN
+				SWITCH (
+					TRUE (),
+					ISBLANK ( RawDisplay ), BLANK (),
+					SourceMask = "%", FORMAT ( RawDisplay, NumberPattern, "en-US" ) & "%",
+					SELECTEDVALUE ( Metric[MetricKey] ) = 12 && ABS ( RawDisplay ) >= 1000000,
+						FORMAT ( DIVIDE ( RawDisplay, 1000000 ), "0.00", "en-US" ) & "M",
+					FORMAT ( RawDisplay, NumberPattern, "en-US" )
+				)
+		displayFolder: YTD
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309044
+
+	measure 'YTD Goal Text' =
+			VAR TargetValue = [YTD Goal Value]
+			VAR SourceMask = SELECTEDVALUE ( Metric[SummaryFormatMask] )
+			VAR NumberPattern = [Metric Numeric Format]
+			RETURN
+				SWITCH (
+					TRUE (),
+					ISBLANK ( TargetValue ), BLANK (),
+					SourceMask = "%", FORMAT ( TargetValue, NumberPattern, "en-US" ) & "%",
+					SELECTEDVALUE ( Metric[MetricKey] ) = 12 && ABS ( TargetValue ) >= 1000000,
+						FORMAT ( DIVIDE ( TargetValue, 1000000 ), "0.00", "en-US" ) & "M",
+					FORMAT ( TargetValue, NumberPattern, "en-US" )
+				)
+		displayFolder: YTD
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309045
+
+	measure 'Selected YTD Endpoint Week Key' =
+			VAR PeriodKey = [Selected Fiscal Period Key]
+			VAR ScopeKey = [Selected Organization Scope Key]
+			RETURN
+				IF (
+					NOT ( ISBLANK ( PeriodKey ) ) && NOT ( ISBLANK ( ScopeKey ) ),
+					CALCULATE (
+						MAX ( 'YTD Score'[FiscalWeekKey] ),
+						REMOVEFILTERS ( 'Fiscal Period' ),
+						REMOVEFILTERS ( 'Fiscal Week' ),
+						REMOVEFILTERS ( Metric ),
+						REMOVEFILTERS ( 'YTD Score' ),
+						TREATAS ( { PeriodKey }, 'YTD Score'[FiscalPeriodKey] ),
+						TREATAS ( { ScopeKey }, 'YTD Score'[OrganizationScopeKey] )
+					)
+				)
+		formatString: 0
+		displayFolder: YTD Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309030
+
+	measure 'YTD Result Row Count' =
+			VAR PeriodKey = [Selected Fiscal Period Key]
+			VAR ScopeKey = [Selected Organization Scope Key]
+			VAR EndpointWeek = [Selected YTD Endpoint Week Key]
+			RETURN
+				IF (
+					NOT ( ISBLANK ( PeriodKey ) )
+						&& NOT ( ISBLANK ( ScopeKey ) )
+						&& NOT ( ISBLANK ( EndpointWeek ) )
+						&& HASONEVALUE ( Metric[MetricKey] ),
+					CALCULATE (
+						COUNTROWS ( 'YTD Score' ) + 0,
+						REMOVEFILTERS ( 'Fiscal Week' ),
+						TREATAS ( { PeriodKey }, 'YTD Score'[FiscalPeriodKey] ),
+						TREATAS ( { EndpointWeek }, 'YTD Score'[FiscalWeekKey] ),
+						TREATAS ( { ScopeKey }, 'YTD Score'[OrganizationScopeKey] )
+					)
+				)
+		formatString: 0
+		displayFolder: Validation
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309031
+
+	measure 'YTD Score Value' =
+			IF (
+				[YTD Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'YTD Score'[ScoreValue] ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					TREATAS ( { [Selected Fiscal Period Key] }, 'YTD Score'[FiscalPeriodKey] ),
+					TREATAS ( { [Selected YTD Endpoint Week Key] }, 'YTD Score'[FiscalWeekKey] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'YTD Score'[OrganizationScopeKey] )
+				)
+			)
+		formatString: 0
+		displayFolder: YTD
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309032
+
+	measure 'YTD Display Value' =
+			IF (
+				[YTD Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'YTD Score'[DisplayValue] ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					TREATAS ( { [Selected Fiscal Period Key] }, 'YTD Score'[FiscalPeriodKey] ),
+					TREATAS ( { [Selected YTD Endpoint Week Key] }, 'YTD Score'[FiscalWeekKey] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'YTD Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: YTD
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309033
+
+	measure 'YTD Underlying Value' =
+			IF (
+				[YTD Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'YTD Score'[UnderlyingValue] ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					TREATAS ( { [Selected Fiscal Period Key] }, 'YTD Score'[FiscalPeriodKey] ),
+					TREATAS ( { [Selected YTD Endpoint Week Key] }, 'YTD Score'[FiscalWeekKey] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'YTD Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: YTD
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309034
+
+	measure 'YTD Goal Value' =
+			IF (
+				[YTD Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'YTD Score'[GoalValue] ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					TREATAS ( { [Selected Fiscal Period Key] }, 'YTD Score'[FiscalPeriodKey] ),
+					TREATAS ( { [Selected YTD Endpoint Week Key] }, 'YTD Score'[FiscalWeekKey] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'YTD Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: YTD
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309035
+
+	measure 'YTD Color' =
+			IF (
+				[YTD Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'YTD Score'[ColorCode] ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					TREATAS ( { [Selected Fiscal Period Key] }, 'YTD Score'[FiscalPeriodKey] ),
+					TREATAS ( { [Selected YTD Endpoint Week Key] }, 'YTD Score'[FiscalWeekKey] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'YTD Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: YTD
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309036
+
 	column OrganizationScopeKey
 		dataType: string
 		isHidden

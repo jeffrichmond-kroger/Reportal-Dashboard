@@ -1,0 +1,8 @@
+Metric[MetricKey]	Metric[MetricName]	[Scope]	[Period label]	[YTD endpoint]	[YTD rows]	[YTD score]	[YTD display value]	[YTD display text]	[YTD underlying value]	[YTD goal value]	[YTD goal text]	[YTD color]
+2	Service	ALL	Period 10 2026	202640	1	83	83	83	85.325			yellow
+3	Care	ALL	Period 10 2026	202640	1	72	72	72	70.075			red
+4	Share	ALL	Period 10 2026	202640	1	45	45	45	48.275			red
+12	Rx Sold	ALL	Period 10 2026	202640	1	88	248242647	248.24M	106.66867721057078	232723095	232.72M	green
+17	Total Overall	ALL	Period 10 2026	202640	1	65	65	65	66.375			red
+87	Auto Refill	ALL	Period 10 2026	202640	1	94	61.24097345027913	61.2%	81.65463126703884			green
+90	Completed Clinical Interactions [NS]	ALL	Period 10 2026	202640	1		459526	459,526	459526			

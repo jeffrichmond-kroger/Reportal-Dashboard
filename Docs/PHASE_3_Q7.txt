@@ -1,0 +1,7 @@
+[Test]	[Actual]	[Expected]	[Pass/Fail]
+Weekly across two metrics returns blank		BLANK	PASS
+Weekly with an invalid organization returns blank		BLANK	PASS
+Weekly without a single week returns blank		BLANK	PASS
+YTD across two metrics returns blank		BLANK	PASS
+YTD with an invalid organization returns blank		BLANK	PASS
+YTD without a selected period returns blank		BLANK	PASS

@@ -1,6 +1,105 @@
 table 'Weekly Score'
 	lineageTag: 37a18808-9834-47bf-a10b-6db8cbaef1be
 
+	measure 'Weekly Display Text' =
+			VAR RawDisplay = [Weekly Display Value]
+			VAR SourceMask = SELECTEDVALUE ( Metric[SummaryFormatMask] )
+			VAR NumberPattern = [Metric Numeric Format]
+			RETURN
+				SWITCH (
+					TRUE (),
+					ISBLANK ( RawDisplay ), BLANK (),
+					SourceMask = "%", FORMAT ( RawDisplay, NumberPattern, "en-US" ) & "%",
+					SELECTEDVALUE ( Metric[MetricKey] ) = 12 && ABS ( RawDisplay ) >= 1000000,
+						FORMAT ( DIVIDE ( RawDisplay, 1000000 ), "0.00", "en-US" ) & "M",
+					FORMAT ( RawDisplay, NumberPattern, "en-US" )
+				)
+		displayFolder: Weekly
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309043
+
+	measure 'Weekly Result Row Count' =
+			VAR ScopeKey = [Selected Organization Scope Key]
+			RETURN
+				IF (
+					NOT ( ISBLANK ( ScopeKey ) )
+						&& HASONEVALUE ( Metric[MetricKey] )
+						&& HASONEVALUE ( 'Fiscal Week'[FiscalWeekKey] ),
+					CALCULATE (
+						COUNTROWS ( 'Weekly Score' ) + 0,
+						TREATAS ( { ScopeKey }, 'Weekly Score'[OrganizationScopeKey] )
+					)
+				)
+		formatString: 0
+		displayFolder: Validation
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309001
+
+	measure 'Weekly Score Value' =
+			IF (
+				[Weekly Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'Weekly Score'[ScoreValue] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'Weekly Score'[OrganizationScopeKey] )
+				)
+			)
+		formatString: 0
+		displayFolder: Weekly
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309002
+
+	measure 'Weekly Display Value' =
+			IF (
+				[Weekly Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'Weekly Score'[DisplayValue] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'Weekly Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: Weekly
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309003
+
+	measure 'Weekly Underlying Value' =
+			IF (
+				[Weekly Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'Weekly Score'[UnderlyingValue] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'Weekly Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: Weekly
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309004
+
+	measure 'Weekly Goal Text' =
+			IF (
+				[Weekly Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'Weekly Score'[GoalText] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'Weekly Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: Weekly
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309005
+
+	measure 'Weekly Color' =
+			IF (
+				[Weekly Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'Weekly Score'[ColorCode] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'Weekly Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: Weekly
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309006
+
+	measure 'Weekly Arrow' =
+			IF (
+				[Weekly Result Row Count] == 1,
+				CALCULATE (
+					SELECTEDVALUE ( 'Weekly Score'[ArrowCode] ),
+					TREATAS ( { [Selected Organization Scope Key] }, 'Weekly Score'[OrganizationScopeKey] )
+				)
+			)
+		displayFolder: Weekly
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309007
+
 	column OrganizationScopeKey
 		dataType: string
 		isHidden

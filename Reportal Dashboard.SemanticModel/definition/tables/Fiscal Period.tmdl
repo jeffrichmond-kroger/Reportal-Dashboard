@@ -1,6 +1,19 @@
 table 'Fiscal Period'
 	lineageTag: 86f45a9b-2a20-4830-a4cb-bcfb4bb3f0b2
 
+	measure 'Selected Fiscal Period Key' = SELECTEDVALUE ( 'Fiscal Period'[FiscalPeriodKey] )
+		formatString: 0
+		displayFolder: Period Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309020
+
+	measure 'Selected Period Label' =
+			IF (
+				HASONEVALUE ( 'Fiscal Period'[FiscalPeriodKey] ),
+				SELECTEDVALUE ( 'Fiscal Period'[PeriodLabel] )
+			)
+		displayFolder: Period Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309021
+
 	column FiscalPeriodKey
 		dataType: int64
 		isHidden

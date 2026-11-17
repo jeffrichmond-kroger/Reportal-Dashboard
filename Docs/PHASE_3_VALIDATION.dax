@@ -112,3 +112,136 @@ RETURN
         )
     )
 ORDER BY [Fact]
+
+EVALUATE
+CALCULATETABLE (
+    SUMMARIZECOLUMNS (
+        Metric[MetricKey],
+        Metric[MetricName],
+        'Fiscal Week'[FiscalWeekKey],
+        'Fiscal Week'[WeekColumnLabel],
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        TREATAS ( { 202610 }, 'Fiscal Week'[FiscalPeriodKey] ),
+        TREATAS ( { 17, 3, 2, 4, 87, 90, 12 }, Metric[MetricKey] ),
+        "Scope", [Selected Organization Scope Key],
+        "Week label", [Selected Week Label],
+        "Week date label", [Selected Week Date Label],
+        "Weekly rows", [Weekly Result Row Count],
+        "Weekly score", [Weekly Score Value],
+        "Weekly display value", [Weekly Display Value],
+        "Weekly display text", [Weekly Display Text],
+        "Weekly underlying value", [Weekly Underlying Value],
+        "Weekly goal text", [Weekly Goal Text],
+        "Weekly color", [Weekly Color],
+        "Weekly arrow", [Weekly Arrow],
+        "YTD endpoint", [Selected YTD Endpoint Week Key],
+        "YTD score under week filter", [YTD Score Value]
+    ),
+    REMOVEFILTERS ( Organization )
+)
+ORDER BY 'Fiscal Week'[FiscalWeekKey], Metric[MetricKey]
+
+EVALUATE
+CALCULATETABLE (
+    SUMMARIZECOLUMNS (
+        Metric[MetricKey],
+        Metric[MetricName],
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        TREATAS ( { 17, 3, 2, 4, 87, 90, 12 }, Metric[MetricKey] ),
+        "Scope", [Selected Organization Scope Key],
+        "Period label", [Selected Period Label],
+        "YTD endpoint", [Selected YTD Endpoint Week Key],
+        "YTD rows", [YTD Result Row Count],
+        "YTD score", [YTD Score Value],
+        "YTD display value", [YTD Display Value],
+        "YTD display text", [YTD Display Text],
+        "YTD underlying value", [YTD Underlying Value],
+        "YTD goal value", [YTD Goal Value],
+        "YTD goal text", [YTD Goal Text],
+        "YTD color", [YTD Color]
+    ),
+    REMOVEFILTERS ( Organization )
+)
+ORDER BY Metric[MetricKey]
+
+EVALUATE
+VAR GuardResults =
+    UNION (
+        ROW (
+            "Test", "YTD without a selected period returns blank",
+            "Actual",
+                CALCULATE (
+                    [YTD Score Value],
+                    REMOVEFILTERS ( Organization ),
+                    REMOVEFILTERS ( 'Fiscal Period' ),
+                    REMOVEFILTERS ( 'Fiscal Week' ),
+                    REMOVEFILTERS ( Metric ),
+                    TREATAS ( { 17 }, Metric[MetricKey] )
+                )
+        ),
+        ROW (
+            "Test", "YTD across two metrics returns blank",
+            "Actual",
+                CALCULATE (
+                    [YTD Score Value],
+                    REMOVEFILTERS ( Organization ),
+                    REMOVEFILTERS ( 'Fiscal Week' ),
+                    REMOVEFILTERS ( Metric ),
+                    TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+                    TREATAS ( { 17, 3 }, Metric[MetricKey] )
+                )
+        ),
+        ROW (
+            "Test", "Weekly without a single week returns blank",
+            "Actual",
+                CALCULATE (
+                    [Weekly Score Value],
+                    REMOVEFILTERS ( Organization ),
+                    REMOVEFILTERS ( 'Fiscal Week' ),
+                    REMOVEFILTERS ( Metric ),
+                    TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+                    TREATAS ( { 17 }, Metric[MetricKey] )
+                )
+        ),
+        ROW (
+            "Test", "Weekly across two metrics returns blank",
+            "Actual",
+                CALCULATE (
+                    [Weekly Score Value],
+                    REMOVEFILTERS ( Organization ),
+                    REMOVEFILTERS ( 'Fiscal Week' ),
+                    REMOVEFILTERS ( Metric ),
+                    TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+                    TREATAS ( { 202637 }, 'Fiscal Week'[FiscalWeekKey] ),
+                    TREATAS ( { 17, 3 }, Metric[MetricKey] )
+                )
+        ),
+        ROW (
+            "Test", "Weekly with an invalid organization returns blank",
+            "Actual",
+                CALCULATE (
+                    [Weekly Score Value],
+                    FILTER ( ALL ( Organization ), FALSE () ),
+                    REMOVEFILTERS ( 'Fiscal Week' ),
+                    REMOVEFILTERS ( Metric ),
+                    TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+                    TREATAS ( { 202637 }, 'Fiscal Week'[FiscalWeekKey] ),
+                    TREATAS ( { 17 }, Metric[MetricKey] )
+                )
+        ),
+        ROW (
+            "Test", "YTD with an invalid organization returns blank",
+            "Actual",
+                CALCULATE (
+                    [YTD Score Value],
+                    FILTER ( ALL ( Organization ), FALSE () ),
+                    REMOVEFILTERS ( 'Fiscal Week' ),
+                    REMOVEFILTERS ( Metric ),
+                    TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+                    TREATAS ( { 17 }, Metric[MetricKey] )
+                )
+        )
+    )
+RETURN
+    ADDCOLUMNS ( GuardResults, "Expected", "BLANK", "Pass/Fail", IF ( ISBLANK ( [Actual] ), "PASS", "FAIL" ) )
+ORDER BY [Test]
