@@ -1,0 +1,13 @@
+[Test]	[Expected]	[Actual]	[Applicable]	[Pass/Fail]	[Weekly key exists]	[YTD key exists]
+01 ALL: all organization filters cleared	ALL	ALL	true	PASS	true	true
+02 DIV: one division number, children unfiltered	DIV|011	DIV|011	true	PASS	true	true
+03 DIST: one division/district number, sites unfiltered	DIST|011|P1	DIST|011|P1	true	PASS	true	true
+04 SITE: one division/district/site number	SITE|011|P1|259	SITE|011|P1|259	true	PASS	true	true
+05 DIV: display slicer, children unfiltered	DIV|011	DIV|011	true	PASS	true	true
+06 DIST: display slicers	DIST|011|P1	DIST|011|P1	true	PASS	true	true
+07 SITE: display slicers	SITE|011|P1|259	SITE|011|P1|259	true	PASS	true	true
+08 SITE: unique site key with inferred parents	SITE|011|P1|259	SITE|011|P1|259	true	PASS	true	true
+09 Invalid organization key returns blank			true	PASS	false	false
+10 Conflicting valid site and different division return blank			true	PASS	false	false
+11 Multiple divisions return blank			true	PASS	false	false
+12 Multiple site displays return blank			true	PASS	false	false

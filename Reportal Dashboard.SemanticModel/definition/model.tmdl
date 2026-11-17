@@ -7,36 +7,18 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation __PBI_TimeIntelligenceEnabled = 1
+annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_ProTooling = ["DevMode"]
+annotation PBI_ProTooling = ["DevMode","DaxQueryView_Desktop"]
 
 annotation PBI_QueryOrder = ["Fiscal Period","Fiscal Week","Metric","Organization","Weekly Score","YTD Score"]
 
 ref table 'Fiscal Period'
-ref table DateTableTemplate_d61bd7ee-6d86-4f4a-9581-2eb085520c11
-ref table LocalDateTable_f9bb453c-c5df-4cfb-9354-e648e9a1acfa
-ref table LocalDateTable_167ab237-2add-47b3-8d94-a7a5dd1484cf
 ref table 'Fiscal Week'
-ref table LocalDateTable_4ed6054b-47ec-4280-8397-6202985d82ab
-ref table LocalDateTable_95623359-38f0-49b2-badf-3155f0c6221a
-ref table LocalDateTable_38759654-8862-4e64-bf0e-13491d457a88
-ref table LocalDateTable_b641268b-bc1b-4d3a-b771-04a9a57a2cca
-ref table LocalDateTable_8ef3722d-8667-44e0-b654-2fdda02f780f
-ref table LocalDateTable_859605e3-270b-4af3-8105-e06d68cbb9a0
-ref table LocalDateTable_0fee50dd-f0b8-4cf5-ae93-4f1985dfc156
-ref table LocalDateTable_e1409e07-d606-49e4-9aad-e9e03431a5db
 ref table Metric
-ref table LocalDateTable_3dfc1f5b-1d05-4aa6-aa21-c8ed6fd39213
 ref table Organization
-ref table LocalDateTable_a476b585-dee6-4565-a6ce-9fde68a6450d
 ref table 'Weekly Score'
-ref table LocalDateTable_2828b5b9-32e2-4bde-b91c-d177f9481fbe
-ref table LocalDateTable_c26ef5e8-39bf-4922-9a73-42d8786ecd56
-ref table LocalDateTable_84f063b0-f06d-441a-b6ae-067f0dc96676
 ref table 'YTD Score'
-ref table LocalDateTable_6078e769-efc5-442c-8940-4398fe9ba62b
-ref table LocalDateTable_3a68965c-4d0f-4041-b049-db3133a1ca5d
 
 ref cultureInfo en-US
 

@@ -1,0 +1,164 @@
+EVALUATE
+UNION (
+    ROW (
+        "Check", "Fiscal Period: PeriodLabel -> PeriodSort conflicts",
+        "Conflicts",
+            COUNTROWS (
+                FILTER (
+                    SUMMARIZE (
+                        'Fiscal Period',
+                        'Fiscal Period'[PeriodLabel],
+                        "SortCount", DISTINCTCOUNT ( 'Fiscal Period'[PeriodSort] )
+                    ),
+                    [SortCount] > 1
+                )
+            ) + 0
+    ),
+    ROW (
+        "Check", "Fiscal Week: WeekColumnLabel -> WeekSort conflicts",
+        "Conflicts",
+            COUNTROWS (
+                FILTER (
+                    SUMMARIZE (
+                        'Fiscal Week',
+                        'Fiscal Week'[WeekColumnLabel],
+                        "SortCount", DISTINCTCOUNT ( 'Fiscal Week'[WeekSort] )
+                    ),
+                    [SortCount] > 1
+                )
+            ) + 0
+    ),
+    ROW (
+        "Check", "Fiscal Week: WeekDateLabel -> WeekSort conflicts",
+        "Conflicts",
+            COUNTROWS (
+                FILTER (
+                    SUMMARIZE (
+                        'Fiscal Week',
+                        'Fiscal Week'[WeekDateLabel],
+                        "SortCount", DISTINCTCOUNT ( 'Fiscal Week'[WeekSort] )
+                    ),
+                    [SortCount] > 1
+                )
+            ) + 0
+    ),
+    ROW (
+        "Check", "Metric: MetricName -> SortNumber conflicts",
+        "Conflicts",
+            COUNTROWS (
+                FILTER (
+                    SUMMARIZE (
+                        Metric,
+                        Metric[MetricName],
+                        "SortCount", DISTINCTCOUNT ( Metric[SortNumber] )
+                    ),
+                    [SortCount] > 1
+                )
+            ) + 0
+    ),
+    ROW (
+        "Check", "Metric: MetricName -> SubSortNumber conflicts",
+        "Conflicts",
+            COUNTROWS (
+                FILTER (
+                    SUMMARIZE (
+                        Metric,
+                        Metric[MetricName],
+                        "SortCount", DISTINCTCOUNT ( Metric[SubSortNumber] )
+                    ),
+                    [SortCount] > 1
+                )
+            ) + 0
+    ),
+    ROW (
+        "Check", "Metric: duplicate SortNumber/SubSortNumber pairs (review ties)",
+        "Conflicts",
+            COUNTROWS ( Metric )
+                - COUNTROWS ( SUMMARIZE ( Metric, Metric[SortNumber], Metric[SubSortNumber] ) )
+    )
+)
+ORDER BY [Check]
+
+EVALUATE
+SELECTCOLUMNS (
+    Metric,
+    "MetricKey", Metric[MetricKey],
+    "MetricName", Metric[MetricName],
+    "ParentMetricKey", Metric[ParentMetricKey],
+    "MetricLevel", Metric[MetricLevel],
+    "SortNumber", Metric[SortNumber],
+    "SubSortNumber", Metric[SubSortNumber],
+    "DashboardVisibleFlag", Metric[DashboardVisibleFlag],
+    "HiddenFlag", Metric[HiddenFlag]
+)
+ORDER BY [SortNumber], [SubSortNumber], [MetricKey]
+
+EVALUATE
+SELECTCOLUMNS (
+    'Fiscal Period',
+    "FiscalYear", 'Fiscal Period'[FiscalYear],
+    "FiscalPeriodKey", 'Fiscal Period'[FiscalPeriodKey],
+    "PeriodLabel", 'Fiscal Period'[PeriodLabel],
+    "PeriodSort", 'Fiscal Period'[PeriodSort],
+    "PreviousFiscalPeriodKey", 'Fiscal Period'[PreviousFiscalPeriodKey],
+    "NextFiscalPeriodKey", 'Fiscal Period'[NextFiscalPeriodKey]
+)
+ORDER BY [PeriodSort], [FiscalPeriodKey]
+
+EVALUATE
+SELECTCOLUMNS (
+    FILTER ( 'Fiscal Week', 'Fiscal Week'[FiscalYear] = 2026 ),
+    "FiscalWeekKey", 'Fiscal Week'[FiscalWeekKey],
+    "FiscalPeriodNumber", 'Fiscal Week'[FiscalPeriodNumber],
+    "PeriodWeekNumber", 'Fiscal Week'[PeriodWeekNumber],
+    "WeekColumnLabel", 'Fiscal Week'[WeekColumnLabel],
+    "WeekDateLabel", 'Fiscal Week'[WeekDateLabel],
+    "WeekSort", 'Fiscal Week'[WeekSort]
+)
+ORDER BY [WeekSort], [FiscalWeekKey]
+
+EVALUATE
+UNION (
+    ROW (
+        "Check", "Fiscal Week: WeekColumnLabel -> FiscalWeekNumber conflicts (expect 0)",
+        "Result",
+            COUNTROWS (
+                FILTER (
+                    SUMMARIZE (
+                        'Fiscal Week',
+                        'Fiscal Week'[WeekColumnLabel],
+                        "SortCount", DISTINCTCOUNT ( 'Fiscal Week'[FiscalWeekNumber] )
+                    ),
+                    [SortCount] > 1
+                )
+            ) + 0
+    ),
+    ROW (
+        "Check", "Metric: Dashboard Metric -> DashboardMetricSort conflicts (expect 0)",
+        "Result",
+            COUNTROWS (
+                FILTER (
+                    SUMMARIZE (
+                        Metric,
+                        Metric[Dashboard Metric],
+                        "SortCount", DISTINCTCOUNT ( Metric[DashboardMetricSort] )
+                    ),
+                    [SortCount] > 1
+                )
+            ) + 0
+    ),
+    ROW (
+        "Check", "Metric: nonblank dashboard labels (expect 17 for current source)",
+        "Result",
+            COUNTROWS (
+                FILTER (
+                    VALUES ( Metric[Dashboard Metric] ),
+                    NOT ( ISBLANK ( Metric[Dashboard Metric] ) )
+                )
+            ) + 0
+    )
+)
+ORDER BY [Check]
+
+EVALUATE
+INFO.VIEW.RELATIONSHIPS ()

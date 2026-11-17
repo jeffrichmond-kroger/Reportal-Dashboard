@@ -1,0 +1,4 @@
+[Check]	[Result]
+Fiscal Week: WeekColumnLabel -> FiscalWeekNumber conflicts (expect 0)	0
+Metric: Dashboard Metric -> DashboardMetricSort conflicts (expect 0)	0
+Metric: nonblank dashboard labels (expect 17 for current source)	17

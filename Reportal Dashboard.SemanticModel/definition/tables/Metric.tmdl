@@ -3,6 +3,7 @@ table Metric
 
 	column MetricKey
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: da0dfc22-f09b-4c24-b811-142e3532aa73
 		summarizeBy: none
@@ -28,9 +29,10 @@ table Metric
 
 	column ParentMetricKey
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 8c64cc50-5450-4704-8702-e006e8b9285c
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: ParentMetricKey
 
 		annotation SummarizationSetBy = Automatic
@@ -47,25 +49,27 @@ table Metric
 		dataType: int64
 		formatString: 0
 		lineageTag: 640be7ab-298e-445e-9090-f80436cb2a3c
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: MetricLevel
 
 		annotation SummarizationSetBy = Automatic
 
 	column SortNumber
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: db0aa34b-4b08-4db0-bda4-62ba1bd0d3b4
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: SortNumber
 
 		annotation SummarizationSetBy = Automatic
 
 	column SubSortNumber
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: f7a85031-ffee-4ecc-851d-3bc3f3c18c28
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: SubSortNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -90,7 +94,7 @@ table Metric
 		dataType: int64
 		formatString: 0
 		lineageTag: 9d70d28c-a6fd-46e0-af27-e643f21fa498
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: SummaryRoundingNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -107,7 +111,7 @@ table Metric
 		dataType: int64
 		formatString: 0
 		lineageTag: 9cdaa599-f8f3-4b46-a001-386c7e6dc197
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: DetailRoundingNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -192,6 +196,7 @@ table Metric
 
 	column SourceModifiedBy
 		dataType: string
+		isHidden
 		lineageTag: 3f91fbb3-3fac-4559-9017-95da65ea5480
 		summarizeBy: none
 		sourceColumn: SourceModifiedBy
@@ -200,17 +205,26 @@ table Metric
 
 	column SourceModifiedDateTime
 		dataType: dateTime
+		isHidden
 		formatString: General Date
 		lineageTag: 5925369f-4459-466e-b1a5-a7035a842fb6
 		summarizeBy: none
 		sourceColumn: SourceModifiedDateTime
 
-		variation Variation
-			isDefault
-			relationship: 3e9ad6c7-a49b-43a9-a0ee-c5d1b33e51f5
-			defaultHierarchy: LocalDateTable_3dfc1f5b-1d05-4aa6-aa21-c8ed6fd39213.'Date Hierarchy'
-
 		annotation SummarizationSetBy = Automatic
+
+	column 'Dashboard Metric' = IF ( Metric[DashboardVisibleFlag] && NOT ( Metric[HiddenFlag] ), Metric[MetricName], BLANK () )
+		dataType: string
+		lineageTag: 6ac16b92-f487-49c3-9c93-b67324e0201a
+		summarizeBy: none
+		sortByColumn: DashboardMetricSort
+
+	column DashboardMetricSort = IF ( Metric[DashboardVisibleFlag] && NOT ( Metric[HiddenFlag] ), Metric[SortNumber], BLANK () )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c8922f69-695e-43b6-8adc-af0e171ae711
+		summarizeBy: none
 
 	partition Metric = m
 		mode: import

@@ -1,0 +1,7 @@
+[Check]	[Conflicts]
+Fiscal Period: PeriodLabel -> PeriodSort conflicts	0
+Fiscal Week: WeekColumnLabel -> WeekSort conflicts	53
+Fiscal Week: WeekDateLabel -> WeekSort conflicts	103
+Metric: duplicate SortNumber/SubSortNumber pairs (review ties)	2
+Metric: MetricName -> SortNumber conflicts	8
+Metric: MetricName -> SubSortNumber conflicts	0

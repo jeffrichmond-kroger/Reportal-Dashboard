@@ -1,0 +1,57 @@
+[MetricKey]	[MetricName]	[ParentMetricKey]	[MetricLevel]	[SortNumber]	[SubSortNumber]	[DashboardVisibleFlag]	[HiddenFlag]
+17	Total Overall	17	0	10000	1	true	false
+3	Care	3	0	20000	2	true	false
+89	Left Nav Clinical Impact [NS]	3	1	20300	3	true	false
+97	Engage Count	89	2	20301	1	false	true
+98	Engage %	89	2	20302	2	false	true
+99	Success Count	89	2	20303	3	false	true
+100	Success %	89	2	20304	4	false	true
+88	PEQ Clinical Impact	3	1	20400	4	true	false
+92	Engage Count	88	2	20401	1	false	true
+93	Engage %	88	2	20402	2	false	true
+94	Success Count	88	2	20403	3	false	true
+95	Success %	88	2	20404	4	false	true
+90	Completed Clinical Interactions [NS]	3	1	20500	5	true	false
+87	Auto Refill	3	1	20600	6	true	false
+38	90-day	3	1	20700	7	true	false
+21	Return to Stock	3	1	20800	8	true	false
+2	Service	2	0	30000	3	true	false
+19	Pharmacist PE	2	1	30100	1	true	false
+83	Forecasted	19	2	30101	1	false	true
+84	Earned	19	2	30102	2	false	true
+85	Actual	19	2	30103	3	false	true
+86	Percent Effective	19	2	30104	4	false	true
+20	Technician PE	2	1	30200	2	true	false
+52	Forecasted	20	2	30201	1	false	true
+53	Earned	20	2	30202	2	false	true
+54	Actual	20	2	30203	3	false	true
+55	Percent Effective	20	2	30204	4	false	true
+56	Overtime	20	2	30205	5	false	true
+45	Overall Satisfaction	2	1	30300	3	true	false
+46	Wait Time	45	2	30301	1	false	true
+61	Rx Ready on Time	45	2	30302	2	false	true
+48	Staff Friendliness	45	2	30303	3	false	true
+7	Ready Rate	2	1	30400	4	true	false
+51	Automation	2	1	30500	5	true	false
+50	Inventory Days Supply [NS]	2	1	30600	6	false	false
+96	Out Of Stock	2	1	30700	7	false	false
+41	CMR Effective Rate	28	2	31001	1	false	true
+63	Total CMR Completed	28	2	31002	2	false	true
+42	TMR Effective Rate	28	2	31003	3	false	true
+64	Total TMR Completed	28	2	31004	4	false	true
+43	MTM Total Opportunities	28	2	31005	5	false	true
+4	Share	4	0	40000	4	true	false
+12	Rx Sold	4	1	40100	1	true	false
+39	Vaccines	4	1	40200	2	true	false
+30	Blood Pressure Adherence	24	2	40301	1	false	true
+31	Cholesterol Adherence	24	2	40302	2	false	true
+32	Diabetes Adherence	24	2	40303	3	false	true
+34	Gaps In Care: Statins	24	2	40304	4	false	true
+26	Individual Performance Measurements	26	0	50000	5	false	false
+57	Verification Workflows	26	1	50100	1	false	false
+58	Other Workflows	26	1	50100	1	false	false
+59	Clinical Workflows	26	1	50100	1	false	false
+5	Patient Census	5	0	60000	6	false	false
+22	New Maintenance Patient	5	1	60100	1	false	false
+23	Prescription Transfers	5	1	60200	2	false	false
+91	Patient Retention	5	1	60300	3	false	false

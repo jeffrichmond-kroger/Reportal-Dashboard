@@ -1,0 +1,114 @@
+EVALUATE
+SELECTCOLUMNS (
+    FILTER (
+        ALL ( 'YTD Score' ),
+        'YTD Score'[OrganizationScopeKey] = "ALL"
+            && 'YTD Score'[FiscalPeriodKey] = 202610
+            && 'YTD Score'[MetricKey] IN { 17, 3, 2, 4, 87, 90, 12 }
+    ),
+    "FiscalPeriodKey", 'YTD Score'[FiscalPeriodKey],
+    "FiscalWeekKey", 'YTD Score'[FiscalWeekKey],
+    "SnapshotDate", 'YTD Score'[SnapshotDate],
+    "MetricKey", 'YTD Score'[MetricKey],
+    "MetricName", RELATED ( Metric[MetricName] ),
+    "ScoreValue", 'YTD Score'[ScoreValue],
+    "DisplayValue", 'YTD Score'[DisplayValue],
+    "UnderlyingValue", 'YTD Score'[UnderlyingValue],
+    "GoalValue", 'YTD Score'[GoalValue],
+    "ColorCode", 'YTD Score'[ColorCode],
+    "CalculationText", 'YTD Score'[CalculationText],
+    "LoadDateTime", 'YTD Score'[LoadDateTime]
+)
+ORDER BY [FiscalWeekKey], [MetricKey], [LoadDateTime]
+
+EVALUATE
+SELECTCOLUMNS (
+    FILTER (
+        ALL ( 'Weekly Score' ),
+        'Weekly Score'[OrganizationScopeKey] = "ALL"
+            && 'Weekly Score'[FiscalPeriodKey] = 202610
+            && 'Weekly Score'[MetricKey] IN { 17, 3, 2, 4, 87, 90, 12 }
+    ),
+    "FiscalPeriodKey", 'Weekly Score'[FiscalPeriodKey],
+    "FiscalWeekKey", 'Weekly Score'[FiscalWeekKey],
+    "WeekStartDate", 'Weekly Score'[WeekStartDate],
+    "WeekEndDate", 'Weekly Score'[WeekEndDate],
+    "MetricKey", 'Weekly Score'[MetricKey],
+    "MetricName", RELATED ( Metric[MetricName] ),
+    "ScoreValue", 'Weekly Score'[ScoreValue],
+    "DisplayValue", 'Weekly Score'[DisplayValue],
+    "UnderlyingValue", 'Weekly Score'[UnderlyingValue],
+    "GoalText", 'Weekly Score'[GoalText],
+    "ColorCode", 'Weekly Score'[ColorCode],
+    "ArrowCode", 'Weekly Score'[ArrowCode],
+    "CalculationText", 'Weekly Score'[CalculationText]
+)
+ORDER BY [FiscalWeekKey], [MetricKey]
+
+EVALUATE
+SELECTCOLUMNS (
+    FILTER ( ALL ( Metric ), Metric[DashboardVisibleFlag] && NOT ( Metric[HiddenFlag] ) ),
+    "MetricKey", Metric[MetricKey],
+    "MetricName", Metric[MetricName],
+    "SortNumber", Metric[SortNumber],
+    "SummaryFormatMask", Metric[SummaryFormatMask],
+    "SummaryRoundingNumber", Metric[SummaryRoundingNumber],
+    "DetailFormatMask", Metric[DetailFormatMask],
+    "DetailRoundingNumber", Metric[DetailRoundingNumber],
+    "LowThresholdText", Metric[LowThresholdText],
+    "HighThresholdText", Metric[HighThresholdText],
+    "MetricDescription", Metric[MetricDescription]
+)
+ORDER BY [SortNumber], [MetricKey]
+
+EVALUATE
+VAR WeeklyRows =
+    FILTER (
+        ALL ( 'Weekly Score' ),
+        'Weekly Score'[OrganizationScopeKey] = "ALL"
+            && 'Weekly Score'[FiscalPeriodKey] = 202610
+    )
+VAR WeeklyGrains =
+    GROUPBY (
+        WeeklyRows,
+        'Weekly Score'[OrganizationScopeKey],
+        'Weekly Score'[FiscalWeekKey],
+        'Weekly Score'[MetricKey],
+        "RowsAtGrain", COUNTX ( CURRENTGROUP (), 1 )
+    )
+VAR YtdRows =
+    FILTER (
+        ALL ( 'YTD Score' ),
+        'YTD Score'[OrganizationScopeKey] = "ALL"
+            && 'YTD Score'[FiscalPeriodKey] = 202610
+    )
+VAR YtdGrains =
+    GROUPBY (
+        YtdRows,
+        'YTD Score'[OrganizationScopeKey],
+        'YTD Score'[FiscalWeekKey],
+        'YTD Score'[MetricKey],
+        "RowsAtGrain", COUNTX ( CURRENTGROUP (), 1 )
+    )
+RETURN
+    UNION (
+        ROW (
+            "Fact", "Weekly Score",
+            "Scope", "ALL",
+            "FiscalPeriodKey", 202610,
+            "Source rows", COUNTROWS ( WeeklyRows ) + 0,
+            "Distinct grains", COUNTROWS ( WeeklyGrains ) + 0,
+            "Duplicate grains", COUNTROWS ( FILTER ( WeeklyGrains, [RowsAtGrain] > 1 ) ) + 0,
+            "Endpoint weeks", COUNTROWS ( SUMMARIZE ( WeeklyRows, 'Weekly Score'[FiscalWeekKey] ) ) + 0
+        ),
+        ROW (
+            "Fact", "YTD Score",
+            "Scope", "ALL",
+            "FiscalPeriodKey", 202610,
+            "Source rows", COUNTROWS ( YtdRows ) + 0,
+            "Distinct grains", COUNTROWS ( YtdGrains ) + 0,
+            "Duplicate grains", COUNTROWS ( FILTER ( YtdGrains, [RowsAtGrain] > 1 ) ) + 0,
+            "Endpoint weeks", COUNTROWS ( SUMMARIZE ( YtdRows, 'YTD Score'[FiscalWeekKey] ) ) + 0
+        )
+    )
+ORDER BY [Fact]
