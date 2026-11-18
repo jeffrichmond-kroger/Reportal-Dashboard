@@ -11,7 +11,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode","DaxQueryView_Desktop"]
 
-annotation PBI_QueryOrder = ["Fiscal Period","Fiscal Week","Metric","Organization","Weekly Score","YTD Score"]
+annotation PBI_QueryOrder = ["Fiscal Period","Fiscal Week","Metric","Organization","Weekly Score","YTD Score","Annual Goal"]
 
 ref table 'Fiscal Period'
 ref table 'Fiscal Week'
@@ -19,6 +19,7 @@ ref table Metric
 ref table Organization
 ref table 'Weekly Score'
 ref table 'YTD Score'
+ref table 'Annual Goal'
 
 ref cultureInfo en-US
 

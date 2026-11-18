@@ -12,50 +12,47 @@ table Organization
 				ISFILTERED ( Organization[SiteDisplay] )
 					|| ISFILTERED ( Organization[SiteNumber] )
 					|| ISFILTERED ( Organization[OrganizationSiteKey] )
-			VAR AmbiguousSelection =
+			VAR DivisionAmbiguous =
 				( ISFILTERED ( Organization[DivisionDisplay] )
 					&& COUNTROWS ( FILTERS ( Organization[DivisionDisplay] ) ) > 1 )
 					|| ( ISFILTERED ( Organization[DivisionNumber] )
 						&& COUNTROWS ( FILTERS ( Organization[DivisionNumber] ) ) > 1 )
-					|| ( ISFILTERED ( Organization[DistrictDisplay] )
+			VAR DistrictAmbiguous =
+				( ISFILTERED ( Organization[DistrictDisplay] )
 						&& COUNTROWS ( FILTERS ( Organization[DistrictDisplay] ) ) > 1 )
 					|| ( ISFILTERED ( Organization[DistrictNumber] )
 						&& COUNTROWS ( FILTERS ( Organization[DistrictNumber] ) ) > 1 )
-					|| ( ISFILTERED ( Organization[SiteDisplay] )
+			VAR SiteAmbiguous =
+				( ISFILTERED ( Organization[SiteDisplay] )
 						&& COUNTROWS ( FILTERS ( Organization[SiteDisplay] ) ) > 1 )
 					|| ( ISFILTERED ( Organization[SiteNumber] )
 						&& COUNTROWS ( FILTERS ( Organization[SiteNumber] ) ) > 1 )
 					|| ( ISFILTERED ( Organization[OrganizationSiteKey] )
 						&& COUNTROWS ( FILTERS ( Organization[OrganizationSiteKey] ) ) > 1 )
-			VAR SelectedDivision = SELECTEDVALUE ( Organization[DivisionNumber] )
-			VAR SelectedDistrict = SELECTEDVALUE ( Organization[DistrictNumber] )
+			VAR SelectedDivision =
+				CALCULATE (
+					SELECTEDVALUE ( Organization[DivisionNumber] ),
+					REMOVEFILTERS (
+						Organization[DistrictDisplay], Organization[DistrictNumber],
+						Organization[SiteDisplay], Organization[SiteNumber], Organization[OrganizationSiteKey]
+					)
+				)
+			VAR SelectedDistrict =
+				CALCULATE (
+					SELECTEDVALUE ( Organization[DistrictNumber] ),
+					REMOVEFILTERS ( Organization[SiteDisplay], Organization[SiteNumber], Organization[OrganizationSiteKey] )
+				)
 			VAR SelectedSite = SELECTEDVALUE ( Organization[SiteNumber] )
 			RETURN
 				SWITCH (
 					TRUE (),
-					AmbiguousSelection || ISEMPTY ( Organization ), BLANK (),
-					SiteFiltered,
-						IF (
-							NOT ( ISBLANK ( SelectedDivision ) )
-								&& NOT ( ISBLANK ( SelectedDistrict ) )
-								&& NOT ( ISBLANK ( SelectedSite ) ),
-							"SITE|" & SelectedDivision & "|" & SelectedDistrict & "|" & SelectedSite,
-							BLANK ()
-						),
-					DistrictFiltered,
-						IF (
-							NOT ( ISBLANK ( SelectedDivision ) )
-								&& NOT ( ISBLANK ( SelectedDistrict ) ),
-							"DIST|" & SelectedDivision & "|" & SelectedDistrict,
-							BLANK ()
-						),
-					DivisionFiltered,
-						IF (
-							NOT ( ISBLANK ( SelectedDivision ) ),
-							"DIV|" & SelectedDivision,
-							BLANK ()
-						),
-					"ALL"
+					NOT ( DivisionFiltered ), "ALL",
+					DivisionAmbiguous || ISBLANK ( SelectedDivision ), BLANK (),
+					NOT ( DistrictFiltered ), "DIV|" & SelectedDivision,
+					DistrictAmbiguous || ISBLANK ( SelectedDistrict ), BLANK (),
+					NOT ( SiteFiltered ), "DIST|" & SelectedDivision & "|" & SelectedDistrict,
+					SiteAmbiguous || ISBLANK ( SelectedSite ), BLANK (),
+					"SITE|" & SelectedDivision & "|" & SelectedDistrict & "|" & SelectedSite
 				)
 		displayFolder: Organization Scope
 		lineageTag: f5ec4a5b-1d0d-4c7b-8fcf-2ae3a630c1d9

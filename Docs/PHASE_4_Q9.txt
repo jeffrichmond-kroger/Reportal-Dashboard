@@ -1,0 +1,2 @@
+﻿"[Source rows]"	"[Distinct grains]"	"[Duplicate grains]"	"[Missing grain keys]"	"[Orphan metric keys]"	"[Years outside calendar]"
+"145784"	"145784"	"0"	"0"	"0"	"1"

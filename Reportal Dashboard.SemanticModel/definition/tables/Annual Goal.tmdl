@@ -1,0 +1,165 @@
+table 'Annual Goal'
+	lineageTag: 148885d9-1602-4e93-92e9-194dbb35df8c
+
+	measure 'Current Goal Raw Text' =
+			
+			VAR TargetYear = SELECTEDVALUE ( 'Fiscal Period'[FiscalYear] )
+			VAR ScopeKey = [Selected Organization Scope Key]
+			VAR GoalRows =
+			    CALCULATETABLE (
+			        'Annual Goal',
+			        TREATAS ( { TargetYear }, 'Annual Goal'[GoalYear] ),
+			        TREATAS ( { ScopeKey }, 'Annual Goal'[OrganizationScopeKey] )
+			    )
+			RETURN
+			    IF (
+			        NOT ( ISBLANK ( TargetYear ) )
+			            && NOT ( ISBLANK ( ScopeKey ) )
+			            && HASONEVALUE ( Metric[MetricKey] )
+			            && COUNTROWS ( GoalRows ) = 1,
+			        MAXX ( GoalRows, 'Annual Goal'[GoalText] )
+			    )
+		lineageTag: 8a7ed0fa-65b1-4471-92a6-836fa71827ea
+
+	measure 'Current Goal Display Text' =
+			
+			VAR RawText = [Current Goal Raw Text]
+			VAR CleanText = TRIM ( RawText )
+			VAR HasPercentSuffix = RIGHT ( CleanText, 1 ) = "%"
+			VAR NumericText =
+			    IF (
+			        HasPercentSuffix,
+			        LEFT ( CleanText, LEN ( CleanText ) - 1 ),
+			        CleanText
+			    )
+			VAR NumericGoal = IFERROR ( VALUE ( NumericText ), BLANK () )
+			VAR SourceMask = SELECTEDVALUE ( Metric[SummaryFormatMask] )
+			VAR NumberPattern = [Metric Numeric Format]
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( RawText ) || CleanText = "", BLANK (),
+			        ISBLANK ( NumericGoal ), RawText,
+			        SourceMask = "%" || HasPercentSuffix,
+			            FORMAT ( NumericGoal, NumberPattern, "en-US" ) & "%",
+			        SELECTEDVALUE ( Metric[MetricKey] ) = 12
+			            && ABS ( NumericGoal ) >= 1000000,
+			            FORMAT ( DIVIDE ( NumericGoal, 1000000 ), "0.00", "en-US" ) & "M",
+			        FORMAT ( NumericGoal, NumberPattern, "en-US" )
+			    )
+		lineageTag: d989c2fc-7fae-4452-996f-93781111442f
+
+	column MetricKey
+		dataType: int64
+		formatString: 0
+		lineageTag: f013a0f1-8a62-4a8a-b570-099e7d2f3214
+		summarizeBy: none
+		sourceColumn: MetricKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentMetricKey
+		dataType: int64
+		formatString: 0
+		lineageTag: a280a7bd-258c-4369-bd63-75167204106f
+		summarizeBy: count
+		sourceColumn: ParentMetricKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column div_no
+		dataType: string
+		lineageTag: 5014ecc0-2b43-49f3-8f30-0c5330675654
+		summarizeBy: none
+		sourceColumn: div_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column zone_no
+		dataType: string
+		lineageTag: 70016ebd-d83c-4585-95bd-140949827fe7
+		summarizeBy: none
+		sourceColumn: zone_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column loc_no
+		dataType: string
+		lineageTag: dfb1494e-f4db-436a-bb34-f20f05fc6468
+		summarizeBy: none
+		sourceColumn: loc_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column GoalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 9bddddb6-2bce-4f9f-bf57-57199fca7ca7
+		summarizeBy: sum
+		sourceColumn: GoalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column LatestGoalDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c4b44950-f35b-416d-910f-e7c9c491f2c6
+		summarizeBy: none
+		sourceColumn: LatestGoalDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column LatestGoalWeek
+		dataType: int64
+		formatString: 0
+		lineageTag: 760832b4-8c43-4a6e-916b-347572e3f811
+		summarizeBy: sum
+		sourceColumn: LatestGoalWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	column GoalText
+		dataType: string
+		lineageTag: 58bec9bb-2cd9-4ecc-a0ff-a2897f4b2a55
+		summarizeBy: none
+		sourceColumn: GoalText
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrganizationScopeKey
+		dataType: string
+		lineageTag: 8d12dd51-cf48-4c6e-b70b-419f6c4aa11f
+		summarizeBy: none
+		sourceColumn: OrganizationScopeKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Annual Goal' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("81reportal-sqlserver01-f28884e84e81bf38.database.windows.net", "reportaldb"),
+				    reportal_factYTDGoals_vw = Source{[Schema="reportal",Item="factYTDGoals_vw"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(reportal_factYTDGoals_vw,{{"metric_id", "MetricKey"}, {"parent_id", "ParentMetricKey"}, {"year", "GoalYear"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"GoalYear", Int64.Type}}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type",{{"goal_tx", "GoalText"}, {"end_dt", "LatestGoalDate"}, {"YER_WEK_NO", "LatestGoalWeek"}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns1",{{"LatestGoalWeek", Int64.Type}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type1", "OrganizationScopeKey", each let
+				    Division = if [div_no] = null then "" else Text.Trim([div_no]),
+				    District = if [zone_no] = null then "" else Text.Trim([zone_no]),
+				    Site = if [loc_no] = null then "" else Text.Trim([loc_no])
+				in
+				    if Division = "" and District = "" and Site = "" then "ALL"
+				    else if Division <> "" and District = "" and Site = "" then "DIV|" & Division
+				    else if Division <> "" and District <> "" and Site = "" then "DIST|" & Division & "|" & District
+				    else if Division <> "" and District <> "" and Site <> "" then "SITE|" & Division & "|" & District & "|" & Site
+				    else null)
+				in
+				    #"Added Custom"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

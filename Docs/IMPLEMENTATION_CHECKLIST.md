@@ -1,6 +1,6 @@
 # Reportal Dashboard Implementation Checklist
 
-Updated: 2026-11-17
+Updated: 2026-11-18
 
 Stop at each phase until all its exit checks pass. Static checks do not prove
 Desktop rendering, refresh, DAX evaluation, or data accuracy. Phase 4 must pass
@@ -10,13 +10,21 @@ before final visual recreation. Do not mark a phase complete based only on edits
 
 - Baseline: `761683e` (`docs`); reference files committed.
 - User confirmed the baseline opens and refreshes with intended credentials.
-- User confirmed the source can verify fact-grain uniqueness and the YTD endpoint;
-  query results and the exact endpoint rule still need to be recorded.
+- Source profiles establish the common YTD endpoint rule recorded in Phase 3.
+  Phase 4 runtime checks confirm global fact-grain uniqueness; historical orphan
+  metric references remain unresolved. The current-goal contract supersedes
+  historical screenshot goal equality and passed validation on 2026-11-18.
 - Organization remains disconnected; use supplied ALL/DIV/DIST/SITE results.
 - Never sum Site results to produce broader scopes or recalculate supplied scores.
-- YTD GoalValue is numeric and supplies the legacy Goal column.
+- Annual Goal from reportal.factYTDGoals_vw supplies the report Goal column.
+  Use the latest row for the selected year/scope/metric even for earlier periods.
+  LatestGoalDate/LatestGoalWeek are metadata, not as-of filters. YTD GoalValue
+  and the old YTD Goal Text measure remain snapshot diagnostics only.
 - Weekly GoalText is authoritative text; preserve supplied formatting.
-- Invalid, ambiguous, or conflicting organization selections return blank.
+- Organization scope is strictly parent-first: Division All means ALL; selected
+  Division with District All means DIV; selected District with Site All means
+  DIST. Irrelevant lower-level selections are ignored. Invalid or ambiguous
+  selections at an active level return blank. Native dropdowns remain selectable.
 - Preserve source connections, types, identifiers, and unrelated user changes.
 
 ## Phase Status
@@ -25,8 +33,8 @@ before final visual recreation. Do not mark a phase complete based only on edits
 - [x] Phase 1: semantic-model cleanup (user accepted 2026-11-17).
 - [x] Phase 2: organization-scope logic (runtime gate passed 2026-11-17).
 - [x] Phase 3: base retrieval measures (runtime gate passed 2026-11-17).
-- [ ] Phase 4: semantic-model data validation (major gate).
-- [ ] Phase 5: report shell.
+- [x] Phase 4: semantic-model data validation (accepted 2026-11-18 with approved historical-data exception).
+- [ ] Phase 5: report shell (rendering and scope regressions pass; final native interaction acceptance pending).
 - [ ] Phase 6: header score visuals.
 - [ ] Phase 7: main score matrix.
 - [ ] Phase 8: period navigation.
@@ -150,6 +158,11 @@ table is required solely for this weekly, supplied-result retrieval design.
 - [x] Pass scope tests without adding organization-to-fact relationships.
 
 ### Phase 2 Implementation And Validation
+
+The following records the original accepted Phase 2 behavior and evidence.
+Its child-only ancestry inference is superseded by the explicitly approved
+Phase 5 parent-first contract below. Use PHASE_5_FILTER_VALIDATION.dax for that
+new behavior; do not treat historical child-only expectations as current tests.
 
 - Measure: Organization[Selected Organization Scope Key], in display folder
   Organization Scope. No new measure table, source query, or relationship.
@@ -314,26 +327,263 @@ values, use absolute difference <= 0.000001 where source precision permits.
 Rounded screenshot percentages and million values are display checks, not exact
 raw numeric expectations.
 
-- [ ] Confirm Period 10, fiscal year 2026, scope ALL, and correct YTD endpoint.
-- [ ] YTD Total Overall/Care/Service/Share = 65/72/83/45.
-- [ ] Weekly Total Overall W37-W40 = 64/65/66/65.
-- [ ] Weekly Care W37-W40 = 66/69/70/69.
-- [ ] Weekly Service W37-W40 = 86/86/87/87.
-- [ ] Weekly Share W37-W40 = 45/45/45/44.
-- [ ] Auto Refill scores = 94/94/94/94; display = 61.2%/61.2%/61.1%/61.1%.
-- [ ] Completed Clinical Interactions = 13,853/15,165/16,263/15,062; no score.
-- [ ] Rx Sold scores = 90/90/90/88; display = 6.79M/6.75M/6.79M/6.93M.
-- [ ] Verify percentage precision, one red metric, goals, colors, and row order.
-- [ ] Verify fact uniqueness and missing-row behavior; retain comparison evidence.
-- [ ] Explicitly accept the data gate before final report visuals.
+- [x] Confirm Period 10, fiscal year 2026, scope ALL, and correct YTD endpoint.
+- [x] YTD Total Overall/Care/Service/Share = 65/72/83/45.
+- [x] Weekly Total Overall W37-W40 = 64/65/66/65.
+- [x] Weekly Care W37-W40 = 66/69/70/69.
+- [x] Weekly Service W37-W40 = 86/86/87/87.
+- [x] Weekly Share W37-W40 = 45/45/45/44.
+- [x] Auto Refill scores = 94/94/94/94; display = 61.2%/61.2%/61.1%/61.1%.
+- [x] Completed Clinical Interactions = 13,853/15,165/16,263/15,062; no score.
+- [x] Rx Sold scores = 90/90/90/88; display = 6.79M/6.75M/6.79M/6.93M.
+- [x] Verify raw precision, red Care/Share scores, and visible status colors for all 17 metrics.
+- [x] Verify all 17 source metrics follow screenshot row order in metadata.
+- [x] Validate scores/displays for all 17 dashboard metrics; classify every goal comparison.
+- [x] Validate actual numerical retrieval for representative DIV/DIST/SITE scopes.
+- [x] Verify global fact uniqueness and missing/zero behavior; retain comparison evidence.
+- [x] Supersede the 13 snapshot-goal mismatches with the approved current-goal contract.
+- [x] Validate Annual Goal uniqueness, raw/display retrieval, year/scope selection, and period independence.
+- [x] User completed Desktop goal tests and saved the PBIP project (2026-11-18).
+- [x] Explicitly disposition historical orphan metric references before gate acceptance.
+- [x] User approved the documented historical-data exception and proceeding to Phase 5 (2026-11-18).
+- [x] Accept the data gate with that exception before final report visuals.
+
+### Phase 4 Automated Evidence
+
+Run the repeatable validator from the project root:
+
+```powershell
+& './Docs/PHASE_4_VALIDATION.ps1'
+```
+
+[PHASE_4_VALIDATION.ps1](PHASE_4_VALIDATION.ps1) reads saved Desktop exports and
+writes [PHASE_4_COMPARISON.csv](PHASE_4_COMPARISON.csv). It does not refresh or
+query the live model. The CSV records legacy expected, source/contract expected,
+Power BI actual, difference, and Pass/Fail for every check. Screenshot targets
+were transcribed from the committed Period 10 image, including all 17 metrics.
+Screenshot percentages/millions are text comparisons; integer scores/counts
+use exact numeric equality. Raw fractional values use at most 0.000001 tolerance.
+Blank and zero are distinct; omitted trailing TSV cells normalize to blank.
+
+The initial 2026-11-17 snapshot-goal comparison had 1,137 PASS and 15 FAIL.
+The approved current-goal contract was implemented by the user in Desktop;
+the user confirmed tests passed and the project was saved on 2026-11-18.
+All ten runtime queries were then executed against that saved Desktop model.
+Current results: **1,595 PASS, 2 FAIL, 0 NOT TESTED** across 1,597 records:
+
+- All 170 screenshot score/display checks pass for all 17 metrics, including
+  blank unscored rows and true numeric zero scores.
+- All 85 visible status-color checks pass. The source token `hide` means no
+  visible status color for Left Nav's weekly rows; raw source comparisons still
+  require the literal token unchanged. No source token or measure was rewritten.
+- All 493 raw source-field retrieval checks pass (408 weekly and 85 YTD).
+- All 340 time/scope/row-count checks and six blank-context checks pass.
+- Four export structure checks and the 17-metric source-order check pass.
+- All 86 current-goal checks pass: the 17-row export count, unique source rows,
+  exact raw text, independent display formatting, selected year, and scope.
+- All 144 goal year/scope cases pass across the nine selectable years, four
+  representative scopes, and four metrics, plus their result-count check.
+  Missing source rows are verified as blank, never substituted from another year.
+- All 221 goal period/week independence cases pass (17 metrics x 13 periods in
+  2026), plus three invalid-context guards and their result-count check.
+- All six Annual Goal integrity checks pass: 145,784 source rows have distinct
+  year/scope/metric grains, no missing grain keys, and no orphan MetricKeys.
+- All 16 scope/metric retrieval cases pass, plus their result-count check.
+- All three missing/zero runtime cases pass, plus their result-count check.
+- Global integrity has 13 passing checks and two orphan-key failures.
+
+These are comparison checks, not 1,597 independent model rows. The comparison
+runner's negative controls also verified blank-versus-zero separation, exact
+integer equality, bounded fractional tolerance, and unavailable-evidence handling;
+synthetic probes were not exported as model evidence. Source metadata order is
+validated; rendered matrix ordering and exact visual colors are later UI checks.
+
+### Phase 4 Approved Current-Goal Contract
+
+Approved 2026-11-18: the Goal column uses Annual Goal, not a YTD score snapshot.
+The source view supplies exactly one latest row per GoalYear, organization
+scope, and MetricKey. The selected Fiscal Period determines the year only.
+Earlier periods intentionally show that year's current goal, even when the
+goal's audit date/week is later. Do not select by YTD endpoint or apply an
+as-of date. Do not fall back to another year, scope, or score-fact goal.
+
+The user's saved model has an active single-direction Metric-to-Annual Goal
+relationship. Organization remains disconnected; TREATAS applies the selected
+year and scope. No period/week relationship was added. Current Goal Raw Text
+requires one matching row; Current Goal Display Text separately formats mixed
+percent strings, percentage-point numbers, counts, and Rx Sold millions.
+Null goals remain blank. Date/week are audit metadata only.
+
+| Metric | Legacy screenshot goal reference | Approved current goal display | Result |
+| --- | --- | --- | --- |
+| Total Overall / Care / Service / Share | 85 | 85 | PASS |
+| Auto Refill | 75.0% | 75.0% | PASS |
+| Rx Sold | 6.51M | 6.51M | PASS |
+| Vaccines | 3.24M | 134,702 | PASS against current source; intentional historical difference |
+| Clinical Interactions | blank | blank | PASS |
+
+The comparison CSV keeps the original goal under Legacy goal reference (not
+authoritative), while expected raw/display goals come from the current source
+and metric formatting metadata. This does not overwrite or pretend to match
+the old screenshot. The 13 earlier snapshot-goal failures are superseded, not
+fixed with constants. Existing snapshot-goal measures remain diagnostics.
+
+Annual Goal also retains 2020 source rows outside the selectable 2022-2030
+calendar. This is coverage information, not an invalid key relationship: goals
+have no physical calendar relationship, and year selection never falls back.
+The outside-year count remains visible in Q9 for audit.
+
+### Phase 4 Executed Runtime Checks
+
+Desktop was initially closed. The assistant opened this project's existing
+cache and connected to its local analysis engine using the installed
+Microsoft.PowerBI.AdomdClient client and Windows integrated authentication.
+The initial six EVALUATE blocks were executed on 2026-11-17. On 2026-11-18,
+after the user's Annual Goal implementation and successful Desktop tests, all
+ten blocks in [PHASE_4_VALIDATION.dax](PHASE_4_VALIDATION.dax) compiled and
+executed directly. The assistant did not refresh sources, save/change the live
+model, or change source connections. Results validate the user's loaded cache,
+not an independently refreshed database snapshot. Desktop remains open.
+
+1. [PHASE_4_Q1.txt](PHASE_4_Q1.txt): 68 actual weekly metric/week rows with
+  independent source fields, all 17 visible metrics, scope ALL, endpoint 202640.
+2. [PHASE_4_Q2.txt](PHASE_4_Q2.txt): 17 actual YTD metric rows at endpoint 202640,
+  including independent raw source values and formatted goals.
+3. [PHASE_4_Q3.txt](PHASE_4_Q3.txt): global fact-grain/key checks on 23,671,000
+  loaded fact rows. Grain uniqueness, nonblank grain keys, week references, and
+  fact/calendar period agreement pass. Metric references fail as detailed below.
+4. [PHASE_4_Q4.txt](PHASE_4_Q4.txt): all 16 ALL/DIV/DIST/SITE retrieval cases
+  pass against actual source rows for Total Overall, Auto Refill, Clinical
+  Interactions, and Rx Sold. Fixtures are ALL, DIV|011, DIST|011|P1, and
+  SITE|011|P1|259 at week/endpoint 202640. No broader scope is aggregated.
+5. [PHASE_4_Q5.txt](PHASE_4_Q5.txt): all three cases pass. Missing valid week
+  202201 returns zero rows and blank values; unloaded period 203013 has no YTD
+  endpoint/fallback; an actual zero at week 202637 stays numeric zero.
+6. [PHASE_4_Q6.txt](PHASE_4_Q6.txt): orphan metric-key drilldown with affected
+  row counts, first/last week, and Period 10 / ALL impact.
+7. [PHASE_4_Q7.txt](PHASE_4_Q7.txt): all 17 current goals at year 2026 / ALL,
+  with raw/display measures, independent source text/counts, and audit date/week.
+8. [PHASE_4_Q8.txt](PHASE_4_Q8.txt): 144 year/scope/metric cases, all PASS,
+  including known missing-year results remaining blank.
+9. [PHASE_4_Q9.txt](PHASE_4_Q9.txt): 145,784 unique annual-goal grains, zero
+  duplicate/missing keys, zero orphan MetricKeys; one audit-only year outside
+  the calendar (2020).
+10. [PHASE_4_Q10.txt](PHASE_4_Q10.txt): all 224 period/week independence and
+  invalid-context cases PASS. A week-key filter cannot change the current goal.
+
+### Phase 4 Historical Integrity Findings
+
+| Fact | Loaded rows / unique grains | Orphan MetricKeys | Affected rows | Period 10 / ALL affected rows |
+| --- | --- | --- | --- | --- |
+| Weekly Score | 12,314,272 | 10, 15, 24, 44, 47, 67 | 682,765 | 0 |
+| YTD Score | 11,356,728 | 10, 15, 24, 44, 67 | 697,762 | 0 |
+
+These 1,380,527 historical rows span fiscal weeks 202249-202446 across the two
+facts. Their MetricKeys do not exist in the loaded Metric dimension. They can
+disappear under metric grouping or surface as unknown/blank members; do not
+silently delete them, invent metric names, or assume they are harmless retired
+metrics. The tested Period 10 2026 / ALL screenshot is unaffected, but broader
+period navigation requires source-owner remediation or an explicit documented
+scope/exception decision. No model or source changes have been applied.
+
+### Phase 4 Acceptance Status
+
+The planned runtime checks are executed; no additional manual export is needed
+for this evidence set. Reproduce the comparisons with the PowerShell validator;
+the ten DAX blocks remain independently runnable for a future refreshed model.
+The validator prefers full Phase 4 exports and retains all failures. A successful
+process exit means evidence generation succeeded, not that the data gate passed.
+
+The goal contract is approved and its implementation passed runtime validation.
+On 2026-11-18 the user explicitly selected "Approve a documented historical-data
+exception and proceed to Phase 5." Phase 4 is accepted with that exception.
+Report scope is not silently restricted to 2026. Historical navigation can still
+omit or surface unknown members for the documented missing MetricKeys; remediation
+remains a source-owner follow-up, not a completed data repair. No rows were removed
+and no metric names, scores, or replacement keys were fabricated.
+
+Raw evidence remains 1,595 PASS and two FAIL. The CSV's separate Gate decision
+column records the approved historical exception only when the exact keys,
+affected-row totals, orphan-key counts, and zero Period 10 / ALL impact still
+match this approval. A changed or additional finding blocks a future gate.
 
 ## Phase 5: Report Shell
 
-- [ ] Establish 1920 x 1080 layout, background, and left filters.
-- [ ] Configure cascading Division/District/Site filters: All or one.
-- [ ] Add period area and help placeholder without invented behavior.
-- [ ] Define unique visual names, accessible labels, and tab order.
+- [x] Establish 1920 x 1080 layout, background, and left filters.
+- [x] Configure Division/District/Site native single-select dropdowns; clear selection means All.
+- [x] Add a single-period selector initialized to Period 10 2026 and an inert help placeholder.
+- [x] Define unique visual names, accessible labels, and tab order.
+- [x] Move Period below Site in the left sidebar and verify its rendered placement.
+- [x] Enforce the approved parent-first scope policy with source-backed runtime tests.
 - [ ] Test filter behavior and layout before adding header visuals.
+
+### Phase 5 Shell Implementation
+
+New Dashboard page: 6f1c890de7344ce092a1, 1920 x 1080, FitToPage. The existing
+Page 1 and its goal-validation table/year filter are preserved unchanged.
+Dashboard is registered first and opens as the active page. Seven native
+visuals provide a neutral left filter band, Reportal title, three organization
+dropdowns, a fiscal-period dropdown, and a noninteractive question-mark help
+placeholder. No score/header/matrix visuals were added during this phase.
+
+Organization dropdowns bind DivisionDisplay, DistrictDisplay, and SiteDisplay
+on the disconnected Organization table, with default native interactions.
+Each permits one selected value; clearing that selection represents All rather
+than enumerating multiple values. Period is at x=24, y=496, width=252, height=96,
+aligned below Site with a 24-pixel gap. The period dropdown binds PeriodLabel and
+stores Period 10 2026 as its actual initial slicer selection, not a page filter
+that prevents later changes. No year restriction was introduced by the approved
+historical-data exception. Help has no fabricated link or action.
+
+Local checks pass for JSON parsing, model field bindings, unique visual IDs,
+accessible names, distinct tab order, selection settings, canvas bounds, and
+initial period state. The earlier Desktop-loading blocker is resolved. On
+2026-11-18 the updated model loaded successfully; the native Dashboard render
+was inspected and shows all four dropdowns aligned in the sidebar, initial
+Period 10 2026, readable labels, and no clipping or visual errors. No custom
+visual or hierarchy-slicer replacement was introduced. Local structural checks
+are not full JSON Schema validation; Desktop loading/rendering is actual runtime
+evidence. The validation page files were not edited.
+
+### Phase 5 Parent-First Scope Contract
+
+The user explicitly chose to retain three separate native Organization slicers
+with normal cascading interactions, not automatic reset/disable or a custom
+visual. The approved DAX behavior is:
+
+| Explicit parent state | Scope result | Lower-level filters |
+| --- | --- | --- |
+| Division cleared / All | ALL | District and Site ignored |
+| One Division; District cleared / All | DIV key | Site ignored |
+| One Division and District; Site cleared / All | DIST key | No Site required |
+| One valid Division, District, and Site | SITE key | All active selections must agree |
+| Invalid/ambiguous active parent or active Site | blank | Never silently broaden the scope |
+
+Selected Organization Scope Key resolves Division after removing District/Site
+filters and District after removing Site filters. This prevents a stale child
+selection, including an empty or conflicting child intersection, from changing
+an otherwise valid higher-level scope. It no longer infers parents from a
+child-only filter. The existing measure name and lineage are unchanged; score
+and current-goal measures reuse the revised resolver without source changes.
+
+This changes calculation semantics, not native slicer state. A child dropdown
+can still be opened and may retain a selected caption while its parent is All;
+that selection is ignored by score/goal retrieval until its parent levels are
+explicitly selected. No automatic clearing or disabled UI state is claimed.
+
+[PHASE_5_FILTER_VALIDATION.dax](PHASE_5_FILTER_VALIDATION.dax) contains shared
+DEFINE fixtures and two EVALUATE blocks. Execute DEFINE with either block.
+Actual Desktop results are retained in
+[PHASE_5_FILTER_Q1.txt](PHASE_5_FILTER_Q1.txt) (20/20 PASS) and
+[PHASE_5_FILTER_Q2.txt](PHASE_5_FILTER_Q2.txt) (6/6 PASS). They cover stale,
+invalid, conflicting, and multi-selected ignored children; valid display/number
+scopes; invalid active levels; and native SUMMARIZECOLUMNS filter semantics.
+All ten Phase 4 queries were rerun: 1,595 PASS, only the same two explicitly
+approved historical exceptions, and no new unapproved gate failures.
+
+Final manual/native interaction acceptance still needs cascading dropdown
+choices, clearing selections, and period changes checked on the actual shell.
+Do not start Phase 6 until that remaining Phase 5 exit check is complete.
 
 ## Phase 6: Header Scores
 

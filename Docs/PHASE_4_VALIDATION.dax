@@ -1,0 +1,369 @@
+EVALUATE
+CALCULATETABLE (
+    SUMMARIZECOLUMNS (
+        Metric[MetricKey],
+        Metric[MetricName],
+        'Fiscal Week'[FiscalWeekKey],
+        'Fiscal Week'[WeekColumnLabel],
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        TREATAS ( { 202610 }, 'Fiscal Week'[FiscalPeriodKey] ),
+        FILTER ( ALL ( Metric ), Metric[DashboardVisibleFlag] && NOT ( Metric[HiddenFlag] ) ),
+        "Scope", [Selected Organization Scope Key],
+        "Week label", [Selected Week Label],
+        "Week date label", [Selected Week Date Label],
+        "Weekly rows", [Weekly Result Row Count],
+        "Weekly score", [Weekly Score Value],
+        "Weekly display value", [Weekly Display Value],
+        "Weekly display text", [Weekly Display Text],
+        "Weekly underlying value", [Weekly Underlying Value],
+        "Weekly goal text", [Weekly Goal Text],
+        "Weekly color", [Weekly Color],
+        "Weekly arrow", [Weekly Arrow],
+        "YTD endpoint", [Selected YTD Endpoint Week Key],
+        "YTD score under week filter", [YTD Score Value],
+        "Source score", CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[ScoreValue] ), TREATAS ( { "ALL" }, 'Weekly Score'[OrganizationScopeKey] ) ),
+        "Source display value", CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[DisplayValue] ), TREATAS ( { "ALL" }, 'Weekly Score'[OrganizationScopeKey] ) ),
+        "Source underlying value", CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[UnderlyingValue] ), TREATAS ( { "ALL" }, 'Weekly Score'[OrganizationScopeKey] ) ),
+        "Source goal text", CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[GoalText] ), TREATAS ( { "ALL" }, 'Weekly Score'[OrganizationScopeKey] ) ),
+        "Source color", CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[ColorCode] ), TREATAS ( { "ALL" }, 'Weekly Score'[OrganizationScopeKey] ) ),
+        "Source arrow", CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[ArrowCode] ), TREATAS ( { "ALL" }, 'Weekly Score'[OrganizationScopeKey] ) )
+    ),
+    REMOVEFILTERS ( Organization )
+)
+ORDER BY 'Fiscal Week'[FiscalWeekKey], Metric[MetricKey]
+
+EVALUATE
+CALCULATETABLE (
+    SUMMARIZECOLUMNS (
+        Metric[MetricKey],
+        Metric[MetricName],
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        FILTER ( ALL ( Metric ), Metric[DashboardVisibleFlag] && NOT ( Metric[HiddenFlag] ) ),
+        "Scope", [Selected Organization Scope Key],
+        "Period label", [Selected Period Label],
+        "YTD endpoint", [Selected YTD Endpoint Week Key],
+        "YTD rows", [YTD Result Row Count],
+        "YTD score", [YTD Score Value],
+        "YTD display value", [YTD Display Value],
+        "YTD display text", [YTD Display Text],
+        "YTD underlying value", [YTD Underlying Value],
+        "YTD goal value", [YTD Goal Value],
+        "YTD goal text", [YTD Goal Text],
+        "YTD color", [YTD Color],
+        "Source score", CALCULATE ( SELECTEDVALUE ( 'YTD Score'[ScoreValue] ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { "ALL" }, 'YTD Score'[OrganizationScopeKey] ), TREATAS ( { 202610 }, 'YTD Score'[FiscalPeriodKey] ), TREATAS ( { 202640 }, 'YTD Score'[FiscalWeekKey] ) ),
+        "Source display value", CALCULATE ( SELECTEDVALUE ( 'YTD Score'[DisplayValue] ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { "ALL" }, 'YTD Score'[OrganizationScopeKey] ), TREATAS ( { 202610 }, 'YTD Score'[FiscalPeriodKey] ), TREATAS ( { 202640 }, 'YTD Score'[FiscalWeekKey] ) ),
+        "Source underlying value", CALCULATE ( SELECTEDVALUE ( 'YTD Score'[UnderlyingValue] ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { "ALL" }, 'YTD Score'[OrganizationScopeKey] ), TREATAS ( { 202610 }, 'YTD Score'[FiscalPeriodKey] ), TREATAS ( { 202640 }, 'YTD Score'[FiscalWeekKey] ) ),
+        "Source goal value", CALCULATE ( SELECTEDVALUE ( 'YTD Score'[GoalValue] ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { "ALL" }, 'YTD Score'[OrganizationScopeKey] ), TREATAS ( { 202610 }, 'YTD Score'[FiscalPeriodKey] ), TREATAS ( { 202640 }, 'YTD Score'[FiscalWeekKey] ) ),
+        "Source color", CALCULATE ( SELECTEDVALUE ( 'YTD Score'[ColorCode] ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { "ALL" }, 'YTD Score'[OrganizationScopeKey] ), TREATAS ( { 202610 }, 'YTD Score'[FiscalPeriodKey] ), TREATAS ( { 202640 }, 'YTD Score'[FiscalWeekKey] ) )
+    ),
+    REMOVEFILTERS ( Organization )
+)
+ORDER BY Metric[MetricKey]
+
+EVALUATE
+VAR WeeklyGrains =
+    GROUPBY (
+        ALL ( 'Weekly Score' ),
+        'Weekly Score'[OrganizationScopeKey],
+        'Weekly Score'[FiscalWeekKey],
+        'Weekly Score'[MetricKey],
+        "Rows at grain", COUNTX ( CURRENTGROUP (), 1 )
+    )
+VAR YtdGrains =
+    GROUPBY (
+        ALL ( 'YTD Score' ),
+        'YTD Score'[OrganizationScopeKey],
+        'YTD Score'[FiscalWeekKey],
+        'YTD Score'[MetricKey],
+        "Rows at grain", COUNTX ( CURRENTGROUP (), 1 )
+    )
+RETURN
+    UNION (
+        ROW (
+            "Fact", "Weekly Score",
+            "Source rows", COUNTROWS ( ALL ( 'Weekly Score' ) ) + 0,
+            "Distinct grains", COUNTROWS ( WeeklyGrains ) + 0,
+            "Duplicate grains", COUNTROWS ( FILTER ( WeeklyGrains, [Rows at grain] > 1 ) ) + 0,
+            "Missing grain keys", COUNTROWS ( FILTER ( ALL ( 'Weekly Score' ), ISBLANK ( 'Weekly Score'[OrganizationScopeKey] ) || ISBLANK ( 'Weekly Score'[FiscalWeekKey] ) || ISBLANK ( 'Weekly Score'[MetricKey] ) ) ) + 0,
+            "Orphan metric keys", COUNTROWS ( EXCEPT ( ALL ( 'Weekly Score'[MetricKey] ), ALLNOBLANKROW ( Metric[MetricKey] ) ) ) + 0,
+            "Orphan week keys", COUNTROWS ( EXCEPT ( ALL ( 'Weekly Score'[FiscalWeekKey] ), ALLNOBLANKROW ( 'Fiscal Week'[FiscalWeekKey] ) ) ) + 0,
+            "Period mismatches", COUNTROWS ( FILTER ( ALL ( 'Weekly Score' ), NOT ( 'Weekly Score'[FiscalPeriodKey] == RELATED ( 'Fiscal Week'[FiscalPeriodKey] ) ) ) ) + 0
+        ),
+        ROW (
+            "Fact", "YTD Score",
+            "Source rows", COUNTROWS ( ALL ( 'YTD Score' ) ) + 0,
+            "Distinct grains", COUNTROWS ( YtdGrains ) + 0,
+            "Duplicate grains", COUNTROWS ( FILTER ( YtdGrains, [Rows at grain] > 1 ) ) + 0,
+            "Missing grain keys", COUNTROWS ( FILTER ( ALL ( 'YTD Score' ), ISBLANK ( 'YTD Score'[OrganizationScopeKey] ) || ISBLANK ( 'YTD Score'[FiscalWeekKey] ) || ISBLANK ( 'YTD Score'[MetricKey] ) ) ) + 0,
+            "Orphan metric keys", COUNTROWS ( EXCEPT ( ALL ( 'YTD Score'[MetricKey] ), ALLNOBLANKROW ( Metric[MetricKey] ) ) ) + 0,
+            "Orphan week keys", COUNTROWS ( EXCEPT ( ALL ( 'YTD Score'[FiscalWeekKey] ), ALLNOBLANKROW ( 'Fiscal Week'[FiscalWeekKey] ) ) ) + 0,
+            "Period mismatches", COUNTROWS ( FILTER ( ALL ( 'YTD Score' ), NOT ( 'YTD Score'[FiscalPeriodKey] == RELATED ( 'Fiscal Week'[FiscalPeriodKey] ) ) ) ) + 0
+        )
+    )
+
+EVALUATE
+VAR ScopeResults =
+    GENERATE (
+        DATATABLE ( "Test metric key", INTEGER, { { 17 }, { 87 }, { 90 }, { 12 } } ),
+        VAR MetricKey = [Test metric key]
+        RETURN
+            CALCULATETABLE (
+                UNION (
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "ALL", "Actual scope", [Selected Organization Scope Key], "Weekly rows", [Weekly Result Row Count], "Weekly score", [Weekly Score Value], "Weekly display", [Weekly Display Value], "YTD rows", [YTD Result Row Count], "YTD endpoint", [Selected YTD Endpoint Week Key], "YTD score", [YTD Score Value], "YTD display", [YTD Display Value] ),
+                        REMOVEFILTERS ( Organization )
+                    ),
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "DIV|011", "Actual scope", [Selected Organization Scope Key], "Weekly rows", [Weekly Result Row Count], "Weekly score", [Weekly Score Value], "Weekly display", [Weekly Display Value], "YTD rows", [YTD Result Row Count], "YTD endpoint", [Selected YTD Endpoint Week Key], "YTD score", [YTD Score Value], "YTD display", [YTD Display Value] ),
+                        REMOVEFILTERS ( Organization ), TREATAS ( { "011" }, Organization[DivisionNumber] )
+                    ),
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "DIST|011|P1", "Actual scope", [Selected Organization Scope Key], "Weekly rows", [Weekly Result Row Count], "Weekly score", [Weekly Score Value], "Weekly display", [Weekly Display Value], "YTD rows", [YTD Result Row Count], "YTD endpoint", [Selected YTD Endpoint Week Key], "YTD score", [YTD Score Value], "YTD display", [YTD Display Value] ),
+                        REMOVEFILTERS ( Organization ), TREATAS ( { "011" }, Organization[DivisionNumber] ), TREATAS ( { "P1" }, Organization[DistrictNumber] )
+                    ),
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "SITE|011|P1|259", "Actual scope", [Selected Organization Scope Key], "Weekly rows", [Weekly Result Row Count], "Weekly score", [Weekly Score Value], "Weekly display", [Weekly Display Value], "YTD rows", [YTD Result Row Count], "YTD endpoint", [Selected YTD Endpoint Week Key], "YTD score", [YTD Score Value], "YTD display", [YTD Display Value] ),
+                        REMOVEFILTERS ( Organization ), TREATAS ( { "011" }, Organization[DivisionNumber] ), TREATAS ( { "P1" }, Organization[DistrictNumber] ), TREATAS ( { "259" }, Organization[SiteNumber] )
+                    )
+                ),
+                TREATAS ( { MetricKey }, Metric[MetricKey] ),
+                TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+                TREATAS ( { 202640 }, 'Fiscal Week'[FiscalWeekKey] )
+            )
+    )
+RETURN
+    GENERATE (
+        ScopeResults,
+        VAR ScopeKey = [Expected scope]
+        VAR MetricKey = [Test metric key]
+        VAR WeeklyRows = FILTER ( ALL ( 'Weekly Score' ), 'Weekly Score'[OrganizationScopeKey] = ScopeKey && 'Weekly Score'[MetricKey] = MetricKey && 'Weekly Score'[FiscalWeekKey] = 202640 )
+        VAR YtdRows = FILTER ( ALL ( 'YTD Score' ), 'YTD Score'[OrganizationScopeKey] = ScopeKey && 'YTD Score'[MetricKey] = MetricKey && 'YTD Score'[FiscalWeekKey] = 202640 )
+        VAR WeeklySourceScore = CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[ScoreValue] ), WeeklyRows )
+        VAR WeeklySourceDisplay = CALCULATE ( SELECTEDVALUE ( 'Weekly Score'[DisplayValue] ), WeeklyRows )
+        VAR YtdSourceScore = CALCULATE ( SELECTEDVALUE ( 'YTD Score'[ScoreValue] ), YtdRows )
+        VAR YtdSourceDisplay = CALCULATE ( SELECTEDVALUE ( 'YTD Score'[DisplayValue] ), YtdRows )
+        VAR HasSource = COUNTROWS ( WeeklyRows ) = 1 && COUNTROWS ( YtdRows ) = 1
+        RETURN
+            ROW (
+                "Weekly source rows", COUNTROWS ( WeeklyRows ) + 0,
+                "Weekly source score", WeeklySourceScore,
+                "Weekly source display", WeeklySourceDisplay,
+                "YTD source rows", COUNTROWS ( YtdRows ) + 0,
+                "YTD source score", YtdSourceScore,
+                "YTD source display", YtdSourceDisplay,
+                "Pass/Fail",
+                    SWITCH (
+                        TRUE (),
+                        NOT ( [Actual scope] == ScopeKey ), "FAIL",
+                        COUNTROWS ( WeeklyRows ) > 1 || COUNTROWS ( YtdRows ) > 1, "FAIL",
+                        NOT ( HasSource ), "NOT TESTED",
+                        [Weekly rows] == 1 && [YTD rows] == 1 && [YTD endpoint] == 202640
+                            && [Weekly score] == WeeklySourceScore && [Weekly display] == WeeklySourceDisplay
+                            && [YTD score] == YtdSourceScore && [YTD display] == YtdSourceDisplay, "PASS",
+                        "FAIL"
+                    )
+            )
+    )
+ORDER BY [Test metric key], [Expected scope]
+
+EVALUATE
+VAR MissingWeek =
+    MINX (
+        EXCEPT (
+            SELECTCOLUMNS ( ALL ( 'Fiscal Week' ), "Week key", 'Fiscal Week'[FiscalWeekKey] ),
+            SELECTCOLUMNS ( ALL ( 'Weekly Score' ), "Week key", 'Weekly Score'[FiscalWeekKey] )
+        ),
+        [Week key]
+    )
+VAR MissingPeriod =
+    MAXX (
+        EXCEPT (
+            SELECTCOLUMNS ( ALL ( 'Fiscal Period' ), "Period key", 'Fiscal Period'[FiscalPeriodKey] ),
+            SELECTCOLUMNS ( ALL ( 'YTD Score' ), "Period key", 'YTD Score'[FiscalPeriodKey] )
+        ),
+        [Period key]
+    )
+VAR ZeroRow =
+    TOPN (
+        1,
+        FILTER ( ALL ( 'Weekly Score' ), 'Weekly Score'[OrganizationScopeKey] = "ALL" && 'Weekly Score'[FiscalPeriodKey] = 202610 && NOT ( ISBLANK ( 'Weekly Score'[ScoreValue] ) ) && 'Weekly Score'[ScoreValue] == 0 ),
+        'Weekly Score'[FiscalWeekKey], ASC, 'Weekly Score'[MetricKey], ASC
+    )
+VAR ZeroWeek = MAXX ( ZeroRow, 'Weekly Score'[FiscalWeekKey] )
+VAR ZeroMetric = MAXX ( ZeroRow, 'Weekly Score'[MetricKey] )
+VAR MissingRows = CALCULATE ( [Weekly Result Row Count], REMOVEFILTERS ( Organization ), REMOVEFILTERS ( 'Fiscal Period' ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { MissingWeek }, 'Fiscal Week'[FiscalWeekKey] ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+VAR MissingScore = CALCULATE ( [Weekly Score Value], REMOVEFILTERS ( Organization ), REMOVEFILTERS ( 'Fiscal Period' ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { MissingWeek }, 'Fiscal Week'[FiscalWeekKey] ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+VAR MissingDisplay = CALCULATE ( [Weekly Display Value], REMOVEFILTERS ( Organization ), REMOVEFILTERS ( 'Fiscal Period' ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { MissingWeek }, 'Fiscal Week'[FiscalWeekKey] ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+VAR MissingEndpoint = CALCULATE ( [Selected YTD Endpoint Week Key], REMOVEFILTERS ( Organization ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { MissingPeriod }, 'Fiscal Period'[FiscalPeriodKey] ) )
+VAR MissingYtd = CALCULATE ( [YTD Score Value], REMOVEFILTERS ( Organization ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { MissingPeriod }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+VAR ZeroScore = CALCULATE ( [Weekly Score Value], REMOVEFILTERS ( Organization ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { ZeroWeek }, 'Fiscal Week'[FiscalWeekKey] ), TREATAS ( { ZeroMetric }, Metric[MetricKey] ) )
+RETURN
+    UNION (
+        ROW ( "Test", "Missing valid week returns row count 0 and blank values", "Fixture key", MissingWeek, "Actual rows", MissingRows, "Actual value", MissingScore, "Expected", "0 rows; blank score/display", "Pass/Fail", IF ( ISBLANK ( MissingWeek ), "NOT TESTED", IF ( MissingRows == 0 && ISBLANK ( MissingScore ) && ISBLANK ( MissingDisplay ), "PASS", "FAIL" ) ) ),
+        ROW ( "Test", "Unloaded valid period does not fall back to another YTD period", "Fixture key", MissingPeriod, "Actual rows", BLANK (), "Actual value", MissingYtd, "Expected", "Blank endpoint and score", "Pass/Fail", IF ( ISBLANK ( MissingPeriod ), "NOT TESTED", IF ( ISBLANK ( MissingEndpoint ) && ISBLANK ( MissingYtd ), "PASS", "FAIL" ) ) ),
+        ROW ( "Test", "A real source zero remains numeric zero, not blank", "Fixture key", ZeroWeek, "Actual rows", COUNTROWS ( ZeroRow ), "Actual value", ZeroScore, "Expected", "0, not blank", "Pass/Fail", IF ( ISBLANK ( ZeroMetric ), "NOT TESTED", IF ( NOT ( ISBLANK ( ZeroScore ) ) && ZeroScore == 0, "PASS", "FAIL" ) ) )
+    )
+
+EVALUATE
+VAR WeeklyOrphans =
+    EXCEPT (
+        SELECTCOLUMNS ( ALL ( 'Weekly Score'[MetricKey] ), "Metric key", 'Weekly Score'[MetricKey] ),
+        SELECTCOLUMNS ( ALLNOBLANKROW ( Metric[MetricKey] ), "Metric key", Metric[MetricKey] )
+    )
+VAR YtdOrphans =
+    EXCEPT (
+        SELECTCOLUMNS ( ALL ( 'YTD Score'[MetricKey] ), "Metric key", 'YTD Score'[MetricKey] ),
+        SELECTCOLUMNS ( ALLNOBLANKROW ( Metric[MetricKey] ), "Metric key", Metric[MetricKey] )
+    )
+RETURN
+    UNION (
+        GENERATE (
+            WeeklyOrphans,
+            VAR MetricKey = [Metric key]
+            VAR SourceRows = FILTER ( ALL ( 'Weekly Score' ), 'Weekly Score'[MetricKey] == MetricKey )
+            RETURN
+                ROW (
+                    "Fact", "Weekly Score",
+                    "Affected rows", COUNTROWS ( SourceRows ),
+                    "First week", MINX ( SourceRows, 'Weekly Score'[FiscalWeekKey] ),
+                    "Last week", MAXX ( SourceRows, 'Weekly Score'[FiscalWeekKey] ),
+                    "Period 10 ALL rows", COUNTROWS ( FILTER ( SourceRows, 'Weekly Score'[FiscalPeriodKey] = 202610 && 'Weekly Score'[OrganizationScopeKey] = "ALL" ) ) + 0
+                )
+        ),
+        GENERATE (
+            YtdOrphans,
+            VAR MetricKey = [Metric key]
+            VAR SourceRows = FILTER ( ALL ( 'YTD Score' ), 'YTD Score'[MetricKey] == MetricKey )
+            RETURN
+                ROW (
+                    "Fact", "YTD Score",
+                    "Affected rows", COUNTROWS ( SourceRows ),
+                    "First week", MINX ( SourceRows, 'YTD Score'[FiscalWeekKey] ),
+                    "Last week", MAXX ( SourceRows, 'YTD Score'[FiscalWeekKey] ),
+                    "Period 10 ALL rows", COUNTROWS ( FILTER ( SourceRows, 'YTD Score'[FiscalPeriodKey] = 202610 && 'YTD Score'[OrganizationScopeKey] = "ALL" ) ) + 0
+                )
+        )
+    )
+ORDER BY [Fact], [Metric key]
+
+EVALUATE
+CALCULATETABLE (
+    SUMMARIZECOLUMNS (
+        Metric[MetricKey],
+        Metric[MetricName],
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        FILTER ( ALL ( Metric ), Metric[DashboardVisibleFlag] && NOT ( Metric[HiddenFlag] ) ),
+        "Scope", [Selected Organization Scope Key],
+        "Goal year", SELECTEDVALUE ( 'Fiscal Period'[FiscalYear] ),
+        "Current goal raw text", [Current Goal Raw Text],
+        "Current goal display text", [Current Goal Display Text],
+        "Source rows", CALCULATE ( COUNTROWS ( 'Annual Goal' ) + 0, TREATAS ( { 2026 }, 'Annual Goal'[GoalYear] ), TREATAS ( { "ALL" }, 'Annual Goal'[OrganizationScopeKey] ) ),
+        "Source goal text", CALCULATE ( SELECTEDVALUE ( 'Annual Goal'[GoalText] ), TREATAS ( { 2026 }, 'Annual Goal'[GoalYear] ), TREATAS ( { "ALL" }, 'Annual Goal'[OrganizationScopeKey] ) ),
+        "Latest goal date", CALCULATE ( SELECTEDVALUE ( 'Annual Goal'[LatestGoalDate] ), TREATAS ( { 2026 }, 'Annual Goal'[GoalYear] ), TREATAS ( { "ALL" }, 'Annual Goal'[OrganizationScopeKey] ) ),
+        "Latest goal week", CALCULATE ( SELECTEDVALUE ( 'Annual Goal'[LatestGoalWeek] ), TREATAS ( { 2026 }, 'Annual Goal'[GoalYear] ), TREATAS ( { "ALL" }, 'Annual Goal'[OrganizationScopeKey] ) )
+    ),
+    REMOVEFILTERS ( Organization )
+)
+ORDER BY Metric[MetricKey]
+
+EVALUATE
+VAR GoalTestContexts =
+    CROSSJOIN (
+        SELECTCOLUMNS ( ALL ( 'Fiscal Period'[FiscalYear] ), "Test year", 'Fiscal Period'[FiscalYear] ),
+        DATATABLE ( "Test metric key", INTEGER, { { 17 }, { 87 }, { 90 }, { 12 } } )
+    )
+VAR ScopeResults =
+    GENERATE (
+        GoalTestContexts,
+        VAR TargetYear = [Test year]
+        VAR MetricKey = [Test metric key]
+        RETURN
+            CALCULATETABLE (
+                UNION (
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "ALL", "Actual scope", [Selected Organization Scope Key], "Actual raw", [Current Goal Raw Text], "Actual display", [Current Goal Display Text] ),
+                        REMOVEFILTERS ( Organization )
+                    ),
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "DIV|011", "Actual scope", [Selected Organization Scope Key], "Actual raw", [Current Goal Raw Text], "Actual display", [Current Goal Display Text] ),
+                        REMOVEFILTERS ( Organization ), TREATAS ( { "011" }, Organization[DivisionNumber] )
+                    ),
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "DIST|011|P1", "Actual scope", [Selected Organization Scope Key], "Actual raw", [Current Goal Raw Text], "Actual display", [Current Goal Display Text] ),
+                        REMOVEFILTERS ( Organization ), TREATAS ( { "011" }, Organization[DivisionNumber] ), TREATAS ( { "P1" }, Organization[DistrictNumber] )
+                    ),
+                    CALCULATETABLE (
+                        ROW ( "Expected scope", "SITE|011|P1|259", "Actual scope", [Selected Organization Scope Key], "Actual raw", [Current Goal Raw Text], "Actual display", [Current Goal Display Text] ),
+                        REMOVEFILTERS ( Organization ), TREATAS ( { "011" }, Organization[DivisionNumber] ), TREATAS ( { "P1" }, Organization[DistrictNumber] ), TREATAS ( { "259" }, Organization[SiteNumber] )
+                    )
+                ),
+                TREATAS ( { TargetYear }, 'Fiscal Period'[FiscalYear] ),
+                TREATAS ( { MetricKey }, Metric[MetricKey] )
+            )
+    )
+RETURN
+    GENERATE (
+        ScopeResults,
+        VAR TargetYear = [Test year]
+        VAR ScopeKey = [Expected scope]
+        VAR MetricKey = [Test metric key]
+        VAR SourceRows = FILTER ( ALL ( 'Annual Goal' ), 'Annual Goal'[GoalYear] == TargetYear && 'Annual Goal'[OrganizationScopeKey] == ScopeKey && 'Annual Goal'[MetricKey] == MetricKey )
+        VAR ExpectedRaw = IF ( COUNTROWS ( SourceRows ) = 1, MAXX ( SourceRows, 'Annual Goal'[GoalText] ) )
+        RETURN
+            ROW (
+                "Source rows", COUNTROWS ( SourceRows ) + 0,
+                "Source raw", ExpectedRaw,
+                "Pass/Fail", IF ( COUNTROWS ( SourceRows ) <= 1 && [Actual scope] == ScopeKey && [Actual raw] == ExpectedRaw && ( COUNTROWS ( SourceRows ) = 1 || ISBLANK ( [Actual display] ) ), "PASS", "FAIL" )
+            )
+    )
+ORDER BY [Test year], [Expected scope], [Test metric key]
+
+EVALUATE
+VAR GoalGrains =
+    GROUPBY (
+        ALL ( 'Annual Goal' ),
+        'Annual Goal'[GoalYear], 'Annual Goal'[OrganizationScopeKey], 'Annual Goal'[MetricKey],
+        "Rows at grain", COUNTX ( CURRENTGROUP (), 1 )
+    )
+RETURN
+    ROW (
+        "Source rows", COUNTROWS ( ALL ( 'Annual Goal' ) ) + 0,
+        "Distinct grains", COUNTROWS ( GoalGrains ) + 0,
+        "Duplicate grains", COUNTROWS ( FILTER ( GoalGrains, [Rows at grain] > 1 ) ) + 0,
+        "Missing grain keys", COUNTROWS ( FILTER ( ALL ( 'Annual Goal' ), ISBLANK ( 'Annual Goal'[GoalYear] ) || ISBLANK ( 'Annual Goal'[MetricKey] ) || ISBLANK ( 'Annual Goal'[OrganizationScopeKey] ) ) ) + 0,
+        "Orphan metric keys", COUNTROWS ( EXCEPT ( ALL ( 'Annual Goal'[MetricKey] ), ALLNOBLANKROW ( Metric[MetricKey] ) ) ) + 0,
+        "Years outside calendar", COUNTROWS ( EXCEPT ( ALL ( 'Annual Goal'[GoalYear] ), ALLNOBLANKROW ( 'Fiscal Period'[FiscalYear] ) ) ) + 0
+    )
+
+EVALUATE
+VAR PeriodCases =
+    CALCULATETABLE (
+        CROSSJOIN (
+            SELECTCOLUMNS ( 'Fiscal Period', "Test period", 'Fiscal Period'[FiscalPeriodKey] ),
+            SELECTCOLUMNS ( FILTER ( ALL ( Metric ), Metric[DashboardVisibleFlag] && NOT ( Metric[HiddenFlag] ) ), "Test metric key", Metric[MetricKey] )
+        ),
+        TREATAS ( { 2026 }, 'Fiscal Period'[FiscalYear] )
+    )
+VAR PeriodResults =
+    GENERATE (
+        PeriodCases,
+        VAR PeriodKey = [Test period]
+        VAR MetricKey = [Test metric key]
+        VAR SourceRows = FILTER ( ALL ( 'Annual Goal' ), 'Annual Goal'[GoalYear] = 2026 && 'Annual Goal'[OrganizationScopeKey] = "ALL" && 'Annual Goal'[MetricKey] == MetricKey )
+        VAR ExpectedRaw = IF ( COUNTROWS ( SourceRows ) = 1, MAXX ( SourceRows, 'Annual Goal'[GoalText] ) )
+        VAR ActualRaw = CALCULATE ( [Current Goal Raw Text], REMOVEFILTERS ( Organization ), TREATAS ( { PeriodKey }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { MetricKey }, Metric[MetricKey] ) )
+        VAR ActualDisplay = CALCULATE ( [Current Goal Display Text], REMOVEFILTERS ( Organization ), TREATAS ( { PeriodKey }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { MetricKey }, Metric[MetricKey] ) )
+        VAR ReferenceDisplay = CALCULATE ( [Current Goal Display Text], REMOVEFILTERS ( Organization ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { MetricKey }, Metric[MetricKey] ) )
+        VAR WeekFilteredRaw = CALCULATE ( [Current Goal Raw Text], REMOVEFILTERS ( Organization ), TREATAS ( { PeriodKey }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { MetricKey }, Metric[MetricKey] ), FILTER ( ALL ( 'Fiscal Week'[FiscalWeekKey] ), FALSE () ) )
+        RETURN ROW ( "Actual raw", ActualRaw, "Actual display", ActualDisplay, "Pass/Fail", IF ( COUNTROWS ( SourceRows ) = 1 && ActualRaw == ExpectedRaw && ActualDisplay == ReferenceDisplay && WeekFilteredRaw == ExpectedRaw, "PASS", "FAIL" ) )
+    )
+VAR NoYear = CALCULATE ( [Current Goal Raw Text], REMOVEFILTERS ( Organization ), REMOVEFILTERS ( 'Fiscal Period' ), REMOVEFILTERS ( 'Fiscal Week' ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+VAR InvalidScope = CALCULATE ( [Current Goal Raw Text], FILTER ( ALL ( Organization ), FALSE () ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+VAR MultipleMetrics = CALCULATE ( [Current Goal Raw Text], REMOVEFILTERS ( Organization ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { 17, 3 }, Metric[MetricKey] ) )
+RETURN
+    UNION (
+        SELECTCOLUMNS ( PeriodResults, "Test", "Period/week independence", "Period key", [Test period], "Metric key", [Test metric key], "Actual raw", [Actual raw], "Actual display", [Actual display], "Pass/Fail", [Pass/Fail] ),
+        ROW ( "Test", "No year returns blank", "Period key", BLANK (), "Metric key", 17, "Actual raw", NoYear, "Actual display", BLANK (), "Pass/Fail", IF ( ISBLANK ( NoYear ), "PASS", "FAIL" ) ),
+        ROW ( "Test", "Invalid scope returns blank", "Period key", 202610, "Metric key", 17, "Actual raw", InvalidScope, "Actual display", BLANK (), "Pass/Fail", IF ( ISBLANK ( InvalidScope ), "PASS", "FAIL" ) ),
+        ROW ( "Test", "Multiple metrics return blank", "Period key", 202610, "Metric key", BLANK (), "Actual raw", MultipleMetrics, "Actual display", BLANK (), "Pass/Fail", IF ( ISBLANK ( MultipleMetrics ), "PASS", "FAIL" ) )
+    )

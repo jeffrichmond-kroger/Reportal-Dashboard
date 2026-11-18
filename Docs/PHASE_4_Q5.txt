@@ -1,0 +1,4 @@
+﻿"[Test]"	"[Fixture key]"	"[Actual rows]"	"[Actual value]"	"[Expected]"	"[Pass/Fail]"
+"Missing valid week returns row count 0 and blank values"	"202201"	"0"	""	"0 rows; blank score/display"	"PASS"
+"Unloaded valid period does not fall back to another YTD period"	"203013"	""	""	"Blank endpoint and score"	"PASS"
+"A real source zero remains numeric zero, not blank"	"202637"	"1"	"0"	"0, not blank"	"PASS"

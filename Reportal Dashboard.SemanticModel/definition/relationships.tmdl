@@ -18,3 +18,7 @@ relationship AutoDetected_3af6bacc-5155-4d45-a092-6f06f849c1fe
 	fromColumn: 'YTD Score'.MetricKey
 	toColumn: Metric.MetricKey
 
+relationship AutoDetected_37871dd5-f1cc-4b46-83a6-0e7cbea7cf39
+	fromColumn: 'Annual Goal'.MetricKey
+	toColumn: Metric.MetricKey
+

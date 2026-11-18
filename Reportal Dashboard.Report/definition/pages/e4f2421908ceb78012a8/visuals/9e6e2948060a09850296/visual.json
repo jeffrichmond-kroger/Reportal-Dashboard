@@ -1,0 +1,112 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "9e6e2948060a09850296",
+  "position": {
+    "x": 9.638592018825376,
+    "y": 0,
+    "z": 0,
+    "height": 773.49700951073635,
+    "width": 1265.0652024708306,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Metric"
+                    }
+                  },
+                  "Property": "Dashboard Metric"
+                }
+              },
+              "queryRef": "Metric.Dashboard Metric",
+              "nativeQueryRef": "Dashboard Metric"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Annual Goal"
+                    }
+                  },
+                  "Property": "Current Goal Raw Text"
+                }
+              },
+              "queryRef": "Annual Goal.Current Goal Raw Text",
+              "nativeQueryRef": "Current Goal Raw Text"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Annual Goal"
+                    }
+                  },
+                  "Property": "Current Goal Display Text"
+                }
+              },
+              "queryRef": "Annual Goal.Current Goal Display Text",
+              "nativeQueryRef": "Current Goal Display Text"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "08b8ffe670893d856b40",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Metric"
+              }
+            },
+            "Property": "Dashboard Metric"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "eff2ce2a1bcbd7486eea",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Annual Goal"
+              }
+            },
+            "Property": "Current Goal Raw Text"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "00cd37c631bd5a11485b",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Annual Goal"
+              }
+            },
+            "Property": "Current Goal Display Text"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

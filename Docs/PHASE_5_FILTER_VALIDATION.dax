@@ -1,0 +1,65 @@
+DEFINE
+    VAR CandidateSites =
+        FILTER (
+            ALL ( Organization ),
+            LEN ( Organization[DivisionNumber] ) > 0 && LEN ( Organization[DistrictNumber] ) > 0
+                && LEN ( Organization[SiteNumber] ) > 0 && LEN ( Organization[OrganizationSiteKey] ) > 0
+                && LEN ( Organization[DivisionDisplay] ) > 0 && LEN ( Organization[DistrictDisplay] ) > 0
+                && LEN ( Organization[SiteDisplay] ) > 0
+        )
+    VAR SampleSite = TOPN ( 1, CandidateSites, Organization[DivisionNumber], ASC, Organization[DistrictNumber], ASC, Organization[SiteNumber], ASC, Organization[OrganizationSiteKey], ASC )
+    VAR SampleDivision = MAXX ( SampleSite, Organization[DivisionNumber] )
+    VAR SampleDistrict = MAXX ( SampleSite, Organization[DistrictNumber] )
+    VAR SampleSiteNumber = MAXX ( SampleSite, Organization[SiteNumber] )
+    VAR SampleDivisionDisplay = MAXX ( SampleSite, Organization[DivisionDisplay] )
+    VAR SampleDistrictDisplay = MAXX ( SampleSite, Organization[DistrictDisplay] )
+    VAR SampleSiteDisplay = MAXX ( SampleSite, Organization[SiteDisplay] )
+    VAR SampleSiteKey = MAXX ( SampleSite, Organization[OrganizationSiteKey] )
+    VAR ConflictingSite = TOPN ( 1, FILTER ( CandidateSites, Organization[DivisionNumber] <> SampleDivision ), Organization[OrganizationSiteKey], ASC )
+    VAR ConflictingSiteKey = MAXX ( ConflictingSite, Organization[OrganizationSiteKey] )
+    VAR TwoDivisions = TOPN ( 2, FILTER ( ALL ( Organization[DivisionNumber] ), LEN ( Organization[DivisionNumber] ) > 0 ), Organization[DivisionNumber], ASC )
+    VAR TwoDistricts = TOPN ( 2, SUMMARIZE ( FILTER ( CandidateSites, Organization[DivisionNumber] = SampleDivision ), Organization[DistrictNumber] ), Organization[DistrictNumber], ASC )
+    VAR TwoSites = TOPN ( 2, SUMMARIZE ( FILTER ( CandidateSites, Organization[DivisionNumber] = SampleDivision && Organization[DistrictNumber] = SampleDistrict ), Organization[SiteDisplay] ), Organization[SiteDisplay], ASC )
+    VAR ExpectedDivision = "DIV|" & SampleDivision
+    VAR ExpectedDistrict = "DIST|" & SampleDivision & "|" & SampleDistrict
+    VAR ExpectedSite = "SITE|" & SampleDivision & "|" & SampleDistrict & "|" & SampleSiteNumber
+    VAR ScopeTests =
+        UNION (
+            ROW ( "Test", "01 All parents cleared", "Expected", "ALL", "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ) ), "Applicable", TRUE () ),
+            ROW ( "Test", "02 Division All ignores district selection", "Expected", "ALL", "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDistrictDisplay }, Organization[DistrictDisplay] ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "03 Division All ignores site-only selection", "Expected", "ALL", "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleSiteKey }, Organization[OrganizationSiteKey] ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "04 Division All ignores invalid child", "Expected", "ALL", "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), FILTER ( ALL ( Organization[SiteNumber] ), FALSE () ) ), "Applicable", TRUE () ),
+            ROW ( "Test", "05 Division All ignores multiple sites", "Expected", "ALL", "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( TwoSites, Organization[SiteDisplay] ) ), "Applicable", COUNTROWS ( TwoSites ) = 2 ),
+            ROW ( "Test", "06 Division selected district All", "Expected", ExpectedDivision, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "07 District All ignores selected site", "Expected", ExpectedDivision, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivisionDisplay }, Organization[DivisionDisplay] ), TREATAS ( { SampleSiteKey }, Organization[OrganizationSiteKey] ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "08 District All ignores conflicting site", "Expected", ExpectedDivision, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( { ConflictingSiteKey }, Organization[OrganizationSiteKey] ) ), "Applicable", NOT ( ISEMPTY ( ConflictingSite ) ) ),
+            ROW ( "Test", "09 District All ignores invalid site", "Expected", ExpectedDivision, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), FILTER ( ALL ( Organization[SiteNumber] ), FALSE () ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "10 District selected site All", "Expected", ExpectedDistrict, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivisionDisplay }, Organization[DivisionDisplay] ), TREATAS ( { SampleDistrictDisplay }, Organization[DistrictDisplay] ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "11 Full display selection", "Expected", ExpectedSite, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivisionDisplay }, Organization[DivisionDisplay] ), TREATAS ( { SampleDistrictDisplay }, Organization[DistrictDisplay] ), TREATAS ( { SampleSiteDisplay }, Organization[SiteDisplay] ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "12 Full number selection", "Expected", ExpectedSite, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( { SampleDistrict }, Organization[DistrictNumber] ), TREATAS ( { SampleSiteNumber }, Organization[SiteNumber] ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "13 Selected district invalid site returns blank", "Expected", BLANK (), "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( { SampleDistrict }, Organization[DistrictNumber] ), FILTER ( ALL ( Organization[SiteNumber] ), FALSE () ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "14 Invalid division returns blank", "Expected", BLANK (), "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), FILTER ( ALL ( Organization[DivisionNumber] ), FALSE () ) ), "Applicable", TRUE () ),
+            ROW ( "Test", "15 Multiple divisions return blank", "Expected", BLANK (), "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( TwoDivisions, Organization[DivisionNumber] ) ), "Applicable", COUNTROWS ( TwoDivisions ) = 2 ),
+            ROW ( "Test", "16 Multiple selected districts return blank", "Expected", BLANK (), "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( TwoDistricts, Organization[DistrictNumber] ) ), "Applicable", COUNTROWS ( TwoDistricts ) = 2 ),
+            ROW ( "Test", "17 Multiple sites with selected parents return blank", "Expected", BLANK (), "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( { SampleDistrict }, Organization[DistrictNumber] ), TREATAS ( TwoSites, Organization[SiteDisplay] ) ), "Applicable", COUNTROWS ( TwoSites ) = 2 ),
+            ROW ( "Test", "18 Invalid selected district returns blank", "Expected", BLANK (), "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), FILTER ( ALL ( Organization[DistrictNumber] ), FALSE () ) ), "Applicable", NOT ( ISEMPTY ( SampleSite ) ) ),
+            ROW ( "Test", "19 District All ignores multiple sites", "Expected", ExpectedDivision, "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( TwoSites, Organization[SiteDisplay] ) ), "Applicable", COUNTROWS ( TwoSites ) = 2 ),
+            ROW ( "Test", "20 Selected district conflicting site returns blank", "Expected", BLANK (), "Actual", CALCULATE ( [Selected Organization Scope Key], REMOVEFILTERS ( Organization ), TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( { SampleDistrict }, Organization[DistrictNumber] ), TREATAS ( { ConflictingSiteKey }, Organization[OrganizationSiteKey] ) ), "Applicable", NOT ( ISEMPTY ( ConflictingSite ) ) )
+        )
+EVALUATE
+    ADDCOLUMNS ( ScopeTests, "Pass/Fail", IF ( NOT ( [Applicable] ), "NOT TESTED", IF ( [Actual] == [Expected], "PASS", "FAIL" ) ) )
+ORDER BY [Test]
+
+EVALUATE
+VAR VisualQueryTests =
+    UNION (
+        ROW ( "Test", "01 Visual query: Division All ignores selected site", "Expected", "ALL", "Actual", MAXX ( SUMMARIZECOLUMNS ( TREATAS ( { SampleSiteKey }, Organization[OrganizationSiteKey] ), "Resolved", [Selected Organization Scope Key] ), [Resolved] ) ),
+        ROW ( "Test", "02 Visual query: Division All ignores invalid child", "Expected", "ALL", "Actual", MAXX ( SUMMARIZECOLUMNS ( FILTER ( ALL ( Organization[SiteNumber] ), FALSE () ), "Resolved", [Selected Organization Scope Key] ), [Resolved] ) ),
+        ROW ( "Test", "03 Visual query: District All ignores conflicting site", "Expected", ExpectedDivision, "Actual", MAXX ( SUMMARIZECOLUMNS ( TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( { ConflictingSiteKey }, Organization[OrganizationSiteKey] ), "Resolved", [Selected Organization Scope Key] ), [Resolved] ) ),
+        ROW ( "Test", "04 Visual query: District All ignores invalid site", "Expected", ExpectedDivision, "Actual", MAXX ( SUMMARIZECOLUMNS ( TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), FILTER ( ALL ( Organization[SiteNumber] ), FALSE () ), "Resolved", [Selected Organization Scope Key] ), [Resolved] ) ),
+        ROW ( "Test", "05 Visual query: District All ignores multiple sites", "Expected", ExpectedDivision, "Actual", MAXX ( SUMMARIZECOLUMNS ( TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( TwoSites, Organization[SiteDisplay] ), "Resolved", [Selected Organization Scope Key] ), [Resolved] ) ),
+        ROW ( "Test", "06 Visual query: Full valid scope", "Expected", ExpectedSite, "Actual", MAXX ( SUMMARIZECOLUMNS ( TREATAS ( { SampleDivision }, Organization[DivisionNumber] ), TREATAS ( { SampleDistrict }, Organization[DistrictNumber] ), TREATAS ( { SampleSiteNumber }, Organization[SiteNumber] ), "Resolved", [Selected Organization Scope Key] ), [Resolved] ) )
+    )
+RETURN
+    ADDCOLUMNS ( VisualQueryTests, "Pass/Fail", IF ( ISEMPTY ( SampleSite ) || ISEMPTY ( ConflictingSite ) || COUNTROWS ( TwoSites ) <> 2, "NOT TESTED", IF ( [Actual] == [Expected], "PASS", "FAIL" ) ) )
+ORDER BY [Test]

@@ -43,7 +43,7 @@ table Metric
 		isHidden
 		formatString: 0
 		lineageTag: 8c64cc50-5450-4704-8702-e006e8b9285c
-		summarizeBy: none
+		summarizeBy: count
 		sourceColumn: ParentMetricKey
 
 		annotation SummarizationSetBy = Automatic
@@ -60,7 +60,7 @@ table Metric
 		dataType: int64
 		formatString: 0
 		lineageTag: 640be7ab-298e-445e-9090-f80436cb2a3c
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: MetricLevel
 
 		annotation SummarizationSetBy = Automatic
@@ -70,7 +70,7 @@ table Metric
 		isHidden
 		formatString: 0
 		lineageTag: db0aa34b-4b08-4db0-bda4-62ba1bd0d3b4
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: SortNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -80,7 +80,7 @@ table Metric
 		isHidden
 		formatString: 0
 		lineageTag: f7a85031-ffee-4ecc-851d-3bc3f3c18c28
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: SubSortNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -105,7 +105,7 @@ table Metric
 		dataType: int64
 		formatString: 0
 		lineageTag: 9d70d28c-a6fd-46e0-af27-e643f21fa498
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: SummaryRoundingNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -122,7 +122,7 @@ table Metric
 		dataType: int64
 		formatString: 0
 		lineageTag: 9cdaa599-f8f3-4b46-a001-386c7e6dc197
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: DetailRoundingNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -235,7 +235,9 @@ table Metric
 		isHidden
 		formatString: 0
 		lineageTag: c8922f69-695e-43b6-8adc-af0e171ae711
-		summarizeBy: none
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
 
 	partition Metric = m
 		mode: import

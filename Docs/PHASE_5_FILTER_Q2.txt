@@ -1,0 +1,7 @@
+﻿"[Test]"	"[Expected]"	"[Actual]"	"[Pass/Fail]"
+"01 Visual query: Division All ignores selected site"	"ALL"	"ALL"	"PASS"
+"02 Visual query: Division All ignores invalid child"	"ALL"	"ALL"	"PASS"
+"03 Visual query: District All ignores conflicting site"	"DIV|011"	"DIV|011"	"PASS"
+"04 Visual query: District All ignores invalid site"	"DIV|011"	"DIV|011"	"PASS"
+"05 Visual query: District All ignores multiple sites"	"DIV|011"	"DIV|011"	"PASS"
+"06 Visual query: Full valid scope"	"SITE|011|P1|259"	"SITE|011|P1|259"	"PASS"
