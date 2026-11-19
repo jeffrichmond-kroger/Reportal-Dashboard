@@ -1,0 +1,8 @@
+﻿"[Week Key]"	"[Case]"	"[Expected]"	"[Actual]"	"[Result]"
+"202601"	"Yellow"	"#D29F00"	"#D29F00"	"PASS"
+"202602"	"Red"	"#AA182C"	"#AA182C"	"PASS"
+"202603"	"Green"	"#2E7A3D"	"#2E7A3D"	"PASS"
+"202604"	"Hide is neutral"	"#616161"	"#616161"	"PASS"
+"202605"	"Blank is neutral"	"#616161"	"#616161"	"PASS"
+"202606"	"Unknown is neutral"	"#616161"	"#616161"	"PASS"
+"202607"	"Case and surrounding whitespace"	"#AA182C"	"#AA182C"	"PASS"

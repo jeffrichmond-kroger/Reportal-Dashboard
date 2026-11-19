@@ -1,0 +1,5 @@
+﻿"[Endpoint Key]"	"[Actual Prior]"	"[Expected Prior]"	"[Result]"
+"202201"			"PASS"
+"202601"	"202552"	"202552"	"PASS"
+"202701"	"202652"	"202652"	"PASS"
+"202640"	"202639"	"202639"	"PASS"

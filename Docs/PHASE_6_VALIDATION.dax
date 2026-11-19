@@ -1,0 +1,270 @@
+-- Query 1: Period 10 2026 ALL headline values and approved change rule.
+EVALUATE
+VAR HeadlineResults =
+    CALCULATETABLE (
+        ADDCOLUMNS (
+            DATATABLE (
+                "Metric Key", INTEGER, "Headline", STRING,
+                "Expected Score", INTEGER, "Expected Change", INTEGER, "Expected Color", STRING,
+                {
+                    { 17, "Total Overall", 65, 0, "#AA182C" },
+                    { 3, "Care", 72, 0, "#AA182C" },
+                    { 2, "Service", 83, 1, "#D29F00" },
+                    { 4, "Share", 45, 0, "#AA182C" }
+                }
+            ),
+            "Actual Score", SWITCH ( [Metric Key], 17, [Header Overall Score], 3, [Header Care Score], 2, [Header Service Score], 4, [Header Share Score] ),
+            "Actual Color", SWITCH ( [Metric Key], 17, [Header Overall Color], 3, [Header Care Color], 2, [Header Service Color], 4, [Header Share Color] ),
+            "Detail", SWITCH ( [Metric Key], 17, [Header Overall Detail], 3, [Header Care Detail], 2, [Header Service Detail], 4, [Header Share Detail] ),
+            "Actual Change", VAR MetricKey = [Metric Key] RETURN CALCULATE ( [YTD Score Change], TREATAS ( { MetricKey }, Metric[MetricKey] ) ),
+            "Current Goal", VAR MetricKey = [Metric Key] RETURN CALCULATE ( [Current Goal Display Text], TREATAS ( { MetricKey }, Metric[MetricKey] ) ),
+            "Endpoint", [Selected YTD Endpoint Week Key],
+            "Prior Week", [Previous YTD Fiscal Week Key]
+        ),
+        REMOVEFILTERS ( Organization ),
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] )
+    )
+RETURN
+    ADDCOLUMNS (
+        HeadlineResults,
+        "Result", IF (
+            [Actual Score] == [Expected Score] && [Actual Change] == [Expected Change]
+                && [Actual Color] == [Expected Color] && [Current Goal] == "85"
+                && [Endpoint] == 202640 && [Prior Week] == 202639,
+            "PASS", "FAIL"
+        )
+    )
+
+-- Query 2: Scope regression and independent prior-snapshot comparison.
+DEFINE
+    MEASURE 'YTD Score'[Phase 6 Header Failures] =
+        VAR MetricFixtures = { 17, 3, 2, 4 }
+        RETURN
+            SUMX (
+                MetricFixtures,
+                VAR MetricKey = [Value]
+                VAR ScopeKey = [Selected Organization Scope Key]
+                VAR PeriodKey = [Selected Fiscal Period Key]
+                VAR RawEndpoint =
+                    MAXX (
+                        FILTER ( ALL ( 'YTD Score' ), 'YTD Score'[OrganizationScopeKey] = ScopeKey && 'YTD Score'[FiscalPeriodKey] = PeriodKey ),
+                        'YTD Score'[FiscalWeekKey]
+                    )
+                VAR EndpointStart = MAXX ( FILTER ( ALL ( 'Fiscal Week' ), 'Fiscal Week'[FiscalWeekKey] = RawEndpoint ), 'Fiscal Week'[WeekStartDate] )
+                VAR RawPriorWeek =
+                    IF (
+                        NOT ISBLANK ( EndpointStart ),
+                        MAXX ( FILTER ( ALL ( 'Fiscal Week' ), 'Fiscal Week'[WeekEndDate] < EndpointStart ), 'Fiscal Week'[FiscalWeekKey] )
+                    )
+                VAR RawCurrentRows = FILTER ( ALL ( 'YTD Score' ), 'YTD Score'[OrganizationScopeKey] = ScopeKey && 'YTD Score'[FiscalWeekKey] = RawEndpoint && 'YTD Score'[MetricKey] = MetricKey )
+                VAR RawPriorRows = FILTER ( ALL ( 'YTD Score' ), 'YTD Score'[OrganizationScopeKey] = ScopeKey && 'YTD Score'[FiscalWeekKey] = RawPriorWeek && 'YTD Score'[MetricKey] = MetricKey )
+                VAR RawCurrent = IF ( NOT ISBLANK ( RawEndpoint ) && COUNTROWS ( RawCurrentRows ) = 1, MAXX ( RawCurrentRows, 'YTD Score'[ScoreValue] ) )
+                VAR RawPrior = IF ( NOT ISBLANK ( RawPriorWeek ) && COUNTROWS ( RawPriorRows ) = 1, MAXX ( RawPriorRows, 'YTD Score'[ScoreValue] ) )
+                VAR ExpectedChange = IF ( NOT ISBLANK ( RawCurrent ) && NOT ISBLANK ( RawPrior ), RawCurrent - RawPrior )
+                VAR ActualScore = SWITCH ( MetricKey, 17, [Header Overall Score], 3, [Header Care Score], 2, [Header Service Score], 4, [Header Share Score] )
+                VAR ActualPrior = CALCULATE ( [Previous YTD Score Value], REMOVEFILTERS ( Metric ), TREATAS ( { MetricKey }, Metric[MetricKey] ) )
+                VAR ActualChange = CALCULATE ( [YTD Score Change], REMOVEFILTERS ( Metric ), TREATAS ( { MetricKey }, Metric[MetricKey] ) )
+                RETURN IF ( ActualScore == RawCurrent && ActualPrior == RawPrior && ActualChange == ExpectedChange, 0, 1 )
+            )
+EVALUATE
+VAR ScopeResults =
+    UNION (
+        CALCULATETABLE ( ROW ( "Case", "ALL", "Scope", [Selected Organization Scope Key], "Failures", [Phase 6 Header Failures] ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ) ),
+        CALCULATETABLE ( ROW ( "Case", "DIV", "Scope", [Selected Organization Scope Key], "Failures", [Phase 6 Header Failures] ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { "011" }, Organization[DivisionNumber] ) ),
+        CALCULATETABLE ( ROW ( "Case", "DIST", "Scope", [Selected Organization Scope Key], "Failures", [Phase 6 Header Failures] ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { "011" }, Organization[DivisionNumber] ), TREATAS ( { "P1" }, Organization[DistrictNumber] ) ),
+        CALCULATETABLE ( ROW ( "Case", "SITE", "Scope", [Selected Organization Scope Key], "Failures", [Phase 6 Header Failures] ), TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { "011" }, Organization[DivisionNumber] ), TREATAS ( { "P1" }, Organization[DistrictNumber] ), TREATAS ( { "259" }, Organization[SiteNumber] ) ),
+        CALCULATETABLE ( ROW ( "Case", "Unloaded period", "Scope", [Selected Organization Scope Key], "Failures", [Phase 6 Header Failures] ), TREATAS ( { 203013 }, 'Fiscal Period'[FiscalPeriodKey] ) )
+    )
+RETURN ADDCOLUMNS ( ScopeResults, "Result", IF ( [Failures] == 0, "PASS", "FAIL" ) )
+
+-- Query 3: Fixed metric isolation and invalid/missing period guards.
+EVALUATE
+UNION (
+    CALCULATETABLE (
+        ROW (
+            "Case", "Unrelated MetricKey and dashboard label filters",
+            "Result", IF (
+                [Header Overall Score] == 65 && [Header Care Score] == 72
+                    && [Header Service Score] == 83 && [Header Share Score] == 45,
+                "PASS", "FAIL"
+            )
+        ),
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        TREATAS ( { 12 }, Metric[MetricKey] ), TREATAS ( { "Rx Sold" }, Metric[Dashboard Metric] )
+    ),
+    CALCULATETABLE (
+        ROW (
+            "Case", "Multiple periods keep all four scores blank",
+            "Result", IF (
+                ISBLANK ( [Header Overall Score] ) && ISBLANK ( [Header Care Score] )
+                    && ISBLANK ( [Header Service Score] ) && ISBLANK ( [Header Share Score] ),
+                "PASS", "FAIL"
+            )
+        ),
+        TREATAS ( { 202609, 202610 }, 'Fiscal Period'[FiscalPeriodKey] )
+    ),
+    ROW (
+        "Case", "No selected period keeps all four scores blank",
+        "Result", IF (
+            ISBLANK ( [Header Overall Score] ) && ISBLANK ( [Header Care Score] )
+                && ISBLANK ( [Header Service Score] ) && ISBLANK ( [Header Share Score] ),
+            "PASS", "FAIL"
+        )
+    ),
+    CALCULATETABLE (
+        ROW (
+            "Case", "Invalid active Division keeps all four scores blank",
+            "Result", IF (
+                ISBLANK ( [Header Overall Score] ) && ISBLANK ( [Header Care Score] )
+                    && ISBLANK ( [Header Service Score] ) && ISBLANK ( [Header Share Score] ),
+                "PASS", "FAIL"
+            )
+        ),
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ), TREATAS ( { "invalid" }, Organization[DivisionNumber] )
+    )
+)
+
+-- Query 4: Formula-level fixtures rebind the model expression to query-only inputs.
+DEFINE
+    MEASURE 'YTD Score'[YTD Score Value] =
+        SWITCH ( SELECTEDVALUE ( 'Fiscal Week'[FiscalWeekNumber] ), 1, BLANK (), 2, 5, 3, 0, 4, 5, 5, 4, 6, 0 )
+    MEASURE 'YTD Score'[Previous YTD Score Value] =
+        SWITCH ( SELECTEDVALUE ( 'Fiscal Week'[FiscalWeekNumber] ), 1, 5, 2, BLANK (), 3, 0, 4, 4, 5, 5, 6, 5 )
+    MEASURE 'YTD Score'[YTD Score Change] =
+        VAR CurrentScore = [YTD Score Value]
+        VAR PriorScore = [Previous YTD Score Value]
+        RETURN
+            IF (
+                NOT ISBLANK ( CurrentScore ) && NOT ISBLANK ( PriorScore ),
+                CurrentScore - PriorScore
+            )
+EVALUATE
+VAR GuardResults =
+    ADDCOLUMNS (
+        DATATABLE (
+            "Week Key", INTEGER, "Case", STRING, "Expected", INTEGER,
+            {
+                { 202601, "Missing current is not zero", BLANK () },
+                { 202602, "Missing previous is not zero", BLANK () },
+                { 202603, "Zero minus zero is zero", 0 },
+                { 202604, "Positive change", 1 },
+                { 202605, "Negative change", -1 },
+                { 202606, "Current zero stays numeric", -5 }
+            }
+        ),
+        "Actual", VAR WeekKey = [Week Key] RETURN CALCULATE ( [YTD Score Change], TREATAS ( { WeekKey }, 'Fiscal Week'[FiscalWeekKey] ) )
+    )
+RETURN ADDCOLUMNS ( GuardResults, "Result", IF ( [Actual] == [Expected], "PASS", "FAIL" ) )
+
+-- Query 5: Formula-level calendar boundary fixtures rebind the model expression.
+DEFINE
+    MEASURE 'YTD Score'[Selected YTD Endpoint Week Key] = SELECTEDVALUE ( 'Fiscal Week'[FiscalWeekKey] )
+    MEASURE 'YTD Score'[Previous YTD Fiscal Week Key] =
+        VAR EndpointWeek = [Selected YTD Endpoint Week Key]
+        VAR EndpointStart =
+            CALCULATE (
+                SELECTEDVALUE ( 'Fiscal Week'[WeekStartDate] ),
+                REMOVEFILTERS ( 'Fiscal Period' ),
+                REMOVEFILTERS ( 'Fiscal Week' ),
+                TREATAS ( { EndpointWeek }, 'Fiscal Week'[FiscalWeekKey] )
+            )
+        RETURN
+            IF (
+                NOT ISBLANK ( EndpointStart ),
+                CALCULATE (
+                    SELECTEDVALUE ( 'Fiscal Week'[FiscalWeekKey] ),
+                    REMOVEFILTERS ( 'Fiscal Period' ),
+                    REMOVEFILTERS ( 'Fiscal Week' ),
+                    TREATAS ( { EndpointStart - 7 }, 'Fiscal Week'[WeekStartDate] )
+                )
+            )
+EVALUATE
+VAR BoundaryResults =
+    ADDCOLUMNS (
+        DATATABLE ( "Endpoint Key", INTEGER, { { 202201 }, { 202601 }, { 202701 }, { 202640 } } ),
+        "Actual Prior", VAR Endpoint = [Endpoint Key] RETURN CALCULATE ( [Previous YTD Fiscal Week Key], TREATAS ( { Endpoint }, 'Fiscal Week'[FiscalWeekKey] ) ),
+        "Expected Prior",
+            VAR Endpoint = [Endpoint Key]
+            VAR StartDate = MAXX ( FILTER ( ALL ( 'Fiscal Week' ), 'Fiscal Week'[FiscalWeekKey] = Endpoint ), 'Fiscal Week'[WeekStartDate] )
+            RETURN MAXX ( FILTER ( ALL ( 'Fiscal Week' ), 'Fiscal Week'[WeekEndDate] < StartDate ), 'Fiscal Week'[FiscalWeekKey] )
+    )
+RETURN ADDCOLUMNS ( BoundaryResults, "Result", IF ( [Actual Prior] == [Expected Prior], "PASS", "FAIL" ) )
+
+-- Query 6: Subtitle uses global source freshness and selected-period coverage.
+EVALUATE
+VAR ExpectedLoad = CALCULATE ( MAX ( 'YTD Score'[LoadDateTime] ), REMOVEFILTERS () )
+VAR ExpectedPrefix = "Data as of " & FORMAT ( ExpectedLoad, "m/d/yyyy", "en-US" ) & UNICHAR ( 10 ) & "Refreshes daily"
+VAR ExpectedPeriod10 = ExpectedPrefix & " and covers 10/11/2026 to 11/7/2026"
+VAR Period9Start = MAXX ( FILTER ( ALL ( 'Fiscal Period' ), 'Fiscal Period'[FiscalPeriodKey] = 202609 ), 'Fiscal Period'[PeriodStartDate] )
+VAR Period9End = MAXX ( FILTER ( ALL ( 'Fiscal Period' ), 'Fiscal Period'[FiscalPeriodKey] = 202609 ), 'Fiscal Period'[PeriodEndDate] )
+VAR SubtitleResults =
+    UNION (
+        CALCULATETABLE (
+            ROW ( "Case", "Period 10 coverage", "Actual", [Report Subtitle], "Expected", ExpectedPeriod10, "Actual Load", [Latest YTD Source Load] ),
+            TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] )
+        ),
+        CALCULATETABLE (
+            ROW ( "Case", "Period 9 coverage changes", "Actual", [Report Subtitle], "Expected", ExpectedPrefix & " and covers " & FORMAT ( Period9Start, "m/d/yyyy", "en-US" ) & " to " & FORMAT ( Period9End, "m/d/yyyy", "en-US" ), "Actual Load", [Latest YTD Source Load] ),
+            TREATAS ( { 202609 }, 'Fiscal Period'[FiscalPeriodKey] )
+        ),
+        ROW ( "Case", "No period omits coverage", "Actual", [Report Subtitle], "Expected", ExpectedPrefix, "Actual Load", [Latest YTD Source Load] ),
+        CALCULATETABLE (
+            ROW ( "Case", "Multiple periods omit coverage", "Actual", [Report Subtitle], "Expected", ExpectedPrefix, "Actual Load", [Latest YTD Source Load] ),
+            TREATAS ( { 202609, 202610 }, 'Fiscal Period'[FiscalPeriodKey] )
+        ),
+        CALCULATETABLE (
+            ROW ( "Case", "Source freshness ignores filters", "Actual", [Report Subtitle], "Expected", ExpectedPeriod10, "Actual Load", [Latest YTD Source Load] ),
+            TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+            TREATAS ( { "011" }, Organization[DivisionNumber] ),
+            TREATAS ( { 12 }, Metric[MetricKey] ),
+            TREATAS ( { 202637 }, 'Fiscal Week'[FiscalWeekKey] )
+        )
+    )
+RETURN ADDCOLUMNS ( SubtitleResults, "Result", IF ( [Actual] == [Expected] && [Actual Load] == ExpectedLoad, "PASS", "FAIL" ) )
+
+-- Query 7: Formula-level source-status palette fixtures; raw codes remain unchanged.
+DEFINE
+    MEASURE 'YTD Score'[YTD Color] =
+        SWITCH ( SELECTEDVALUE ( 'Fiscal Week'[FiscalWeekNumber] ), 1, "yellow", 2, "red", 3, "green", 4, "hide", 5, BLANK (), 6, "unknown", 7, " RED " )
+    MEASURE 'YTD Score'[YTD Status Color] =
+        SWITCH (
+            LOWER ( TRIM ( [YTD Color] ) ),
+            "red", "#AA182C",
+            "yellow", "#D29F00",
+            "green", "#2E7A3D",
+            "#616161"
+        )
+EVALUATE
+VAR PaletteResults =
+    ADDCOLUMNS (
+        DATATABLE (
+            "Week Key", INTEGER, "Case", STRING, "Expected", STRING,
+            {
+                { 202601, "Yellow", "#D29F00" },
+                { 202602, "Red", "#AA182C" },
+                { 202603, "Green", "#2E7A3D" },
+                { 202604, "Hide is neutral", "#616161" },
+                { 202605, "Blank is neutral", "#616161" },
+                { 202606, "Unknown is neutral", "#616161" },
+                { 202607, "Case and surrounding whitespace", "#AA182C" }
+            }
+        ),
+        "Actual", VAR WeekKey = [Week Key] RETURN CALCULATE ( [YTD Status Color], TREATAS ( { WeekKey }, 'Fiscal Week'[FiscalWeekKey] ) )
+    )
+RETURN ADDCOLUMNS ( PaletteResults, "Result", IF ( [Actual] == [Expected], "PASS", "FAIL" ) )
+
+-- Query 8: Separate fixed-metric goals and one-line YTD captions ignore unrelated metric filters.
+EVALUATE
+VAR HeaderLayoutResults =
+    CALCULATETABLE (
+        UNION (
+            ROW ( "Case", "Overall", "Goal", [Header Overall Goal], "Detail", [Header Overall Detail], "Expected Detail", "YTD W40 | +0 vs last wk" ),
+            ROW ( "Case", "Care", "Goal", [Header Care Goal], "Detail", [Header Care Detail], "Expected Detail", "YTD W40 | +0 vs last wk" ),
+            ROW ( "Case", "Service", "Goal", [Header Service Goal], "Detail", [Header Service Detail], "Expected Detail", "YTD W40 | +1 vs last wk" ),
+            ROW ( "Case", "Share", "Goal", [Header Share Goal], "Detail", [Header Share Detail], "Expected Detail", "YTD W40 | +0 vs last wk" )
+        ),
+        REMOVEFILTERS (),
+        TREATAS ( { 202610 }, 'Fiscal Period'[FiscalPeriodKey] ),
+        TREATAS ( { 12 }, Metric[MetricKey] )
+    )
+RETURN ADDCOLUMNS ( HeaderLayoutResults, "Result", IF ( [Goal] == "Goal 85" && [Detail] == [Expected Detail], "PASS", "FAIL" ) )

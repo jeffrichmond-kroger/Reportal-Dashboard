@@ -26,6 +26,18 @@ before final visual recreation. Do not mark a phase complete based only on edits
   DIST. Irrelevant lower-level selections are ignored. Invalid or ambiguous
   selections at an active level return blank. Native dropdowns remain selectable.
 - Preserve source connections, types, identifiers, and unrelated user changes.
+- Score card template.png guides styling; Screenshot Dashboard Period 10.png
+  guides functionality and example data. Current-goal source decisions remain
+  authoritative where the historical screenshot differs.
+- Header change compares the selected YTD score with the same scope/metric's
+  previous fiscal-week YTD snapshot (user confirmed 2026-11-19). Missing prior
+  data remains blank; do not use weekly scores or skip to an older snapshot.
+- Report-wide status palette (user specified 2026-11-19): yellow #D29F00,
+  red #AA182C, green #2E7A3D. Preserve raw status tokens; blank/hide remain neutral.
+- The subtitle uses the latest imported YTD LoadDateTime, independent of report
+  filters, for Data as of. Coverage dates are the selected Fiscal Period's
+  PeriodStartDate and PeriodEndDate, formatted m/d/yyyy. Refreshes daily is
+  the user's requested statement, not an independently verified schedule.
 
 ## Phase Status
 
@@ -35,7 +47,7 @@ before final visual recreation. Do not mark a phase complete based only on edits
 - [x] Phase 3: base retrieval measures (runtime gate passed 2026-11-17).
 - [x] Phase 4: semantic-model data validation (accepted 2026-11-18 with approved historical-data exception).
 - [x] Phase 5: report shell (final native filter-interaction acceptance confirmed by user 2026-11-19).
-- [ ] Phase 6: header score visuals.
+- [x] Phase 6: header score visuals (39/39 model checks pass; Desktop-verified and user accepted 2026-11-19).
 - [ ] Phase 7: main score matrix.
 - [ ] Phase 8: period navigation.
 - [ ] Phase 9: visual comparison and refinement.
@@ -547,8 +559,8 @@ The 2026-11-19 styling reference is
 restrained typography, main-area title, and blue outlined help treatment replace
 the initial shell styling without adding its example Business Unit field.
 The existing Division/District/Site/Period fields remain authoritative. Example
-refresh timestamps, coverage dates, and daily-refresh claims were not copied:
-their production source/refresh contract has not been established.
+dates from the template were not copied. The later user-approved subtitle uses
+actual imported source-load and selected fiscal-period dates as recorded below.
 
 The native help button navigates to page 8b23f01a596e4ac6a721, How to read this,
 hidden from the reading-mode page list. A native left-arrow button returns to
@@ -631,11 +643,181 @@ and source must still be confirmed before badges are implemented.
 
 ## Phase 6: Header Scores
 
-- [ ] Display supplied Total Overall, Care, Service, and Share scores/colors.
-- [ ] Confirm change-badge meaning/source before implementing badges.
-- [ ] Match ring presentation, tooltip content, and blank states.
-- [ ] Test organization filters and protect fixed KPI metrics from matrix clicks.
-- [ ] Validate data and appearance in Desktop.
+- [x] Display supplied Total Overall, Care, Service, and Share scores/colors.
+- [x] Confirm change meaning/source before implementing captions (2026-11-19).
+- [x] Match flat-card template presentation, readable captions, and guarded blank states.
+- [x] Test organization contexts and protect fixed KPI metrics from other Metric filters.
+- [x] Validate header data and change behavior in Desktop's model.
+- [x] Complete final native appearance verification in Desktop.
+- [x] Obtain user acceptance before starting Phase 7 (2026-11-19: "Phase 6 tests good").
+
+### Phase 6 Implementation
+
+The user explicitly separated visual and behavioral references on 2026-11-19:
+[Score card template.png](Score%20card%20template.png) controls styling, while
+[Screenshot Dashboard Period 10.png](Screenshot%20Dashboard%20Period%2010.png)
+controls functionality and sample comparisons. Flat numeric cards supersede
+the earlier ring-presentation checklist wording; no gauge or ring is required.
+The accepted current annual-goal contract is unchanged.
+
+Four native cardVisual visuals are at y=112, height=152: Overall at x=352,
+width=384, followed by Care/Service/Share at x=760/1032/1304, width=248.
+Each uses one score query, a dynamic source-status color, and a measure-driven
+caption with current annual goal, YTD endpoint week, and signed change.
+The existing shell, help controls, saved slicer selections, validation page,
+source connections, and relationships are preserved. No Phase 7 matrix or
+Phase 8 navigation has been added.
+
+The user confirmed that change means current YTD score minus the previous
+fiscal-week YTD snapshot for the same organization scope and metric. The prior
+week comes from the calendar's exact seven-day predecessor, including year
+boundaries, not the most recent available fact row. A missing, duplicate, or
+blank prior score does not become zero and does not trigger an older fallback.
+Current YTD retrieval and its common endpoint are unchanged. Change captions
+use neutral styling: direction is not assigned an unconfirmed favorable status.
+
+Measures live in the existing YTD Score table, in Header/Header Context folders.
+Each fixed Overall/Care/Service/Share score, color, and detail wrapper removes
+all Metric filters and applies key 17/3/2/4 respectively. This protects the
+headline identity from future matrix selections while preserving period and
+organization context. Raw red/yellow/green status tokens map only for display
+to #AA182C/#D29F00/#2E7A3D; blank, hide, or unknown tokens use neutral #616161.
+The raw source status and numeric measures are not overwritten. Current goal
+text still comes from Annual Goal, not the historical YTD snapshot goal.
+
+### Phase 6 Runtime Evidence
+
+[PHASE_6_VALIDATION.dax](PHASE_6_VALIDATION.dax) contains eight independently
+runnable query blocks. All were executed read-only against the cached Desktop
+model, without source refresh or live-model mutation by the validation queries.
+Results total 39/39 PASS after the separated-goal and two-line-subtitle model checks:
+
+| Query | Evidence | Result |
+| --- | --- | --- |
+| Q1 | [PHASE_6_Q1.txt](PHASE_6_Q1.txt) | Four screenshot headline cases: scores 65/72/83/45, changes +0/+0/+1/+0, goals 85, expected colors, endpoint 202640 and previous week 202639. |
+| Q2 | [PHASE_6_Q2.txt](PHASE_6_Q2.txt) | Five context cases (ALL/DIV/DIST/SITE/unloaded period), each checking all four fixed scores, raw prior snapshots, and changes. |
+| Q3 | [PHASE_6_Q3.txt](PHASE_6_Q3.txt) | Four guard cases: unrelated Metric filters, multiple periods, no period, and invalid active Division. |
+| Q4 | [PHASE_6_Q4.txt](PHASE_6_Q4.txt) | Six formula-level blank/zero/positive/negative change fixtures. |
+| Q5 | [PHASE_6_Q5.txt](PHASE_6_Q5.txt) | Four formula-level calendar predecessor fixtures, including year boundaries and the first calendar week. |
+| Q6 | [PHASE_6_Q6.txt](PHASE_6_Q6.txt) | Five subtitle cases: selected-period coverage, period change, missing/multiple-period coverage guards, and filter-independent source freshness. |
+| Q7 | [PHASE_6_Q7.txt](PHASE_6_Q7.txt) | Seven formula-level exact-palette and neutral-status cases. |
+| Q8 | [PHASE_6_Q8.txt](PHASE_6_Q8.txt) | Four compiled fixed-metric side-goal and one-line YTD-caption cases under an unrelated metric filter. |
+
+Q1-Q3, Q6, and Q8 exercise compiled model measures. Q4-Q5 and Q7 explicitly rebind the model's
+unchanged expressions to query-only fixtures because query-scoped dependency
+overrides alone do not propagate through already-compiled model expressions.
+The rebound expressions were mechanically compared with the TMDL definitions
+and match exactly apart from whitespace. These fixtures do not alter the model.
+
+The initial native render confirmed the correct values and dynamic captions,
+but exposed caption truncation and the native inner tile outline. Both were
+corrected and verified in a final full-width Desktop render on 2026-11-19:
+each KPI has one square outer frame, its colored score, and a readable two-line
+goal/endpoint/change caption without truncation. Category-label position and
+wrapping use the native default-state selector with unscoped visibility;
+the native outline is disabled separately from the outer visual frame.
+The accepted filter rail, title, help button, and saved All/P2/All/Period 10 2026
+selections remain visible and unchanged. Desktop successfully reopened the
+saved model and report. Validation queries did not refresh the source or
+modify the live model; ordinary Desktop saves preserved the project before
+external report edits. The Phase 6 acceptance gate was satisfied on 2026-11-19,
+as recorded below.
+
+### Phase 6 Typography, Dates, And Palette Refinement
+
+On 2026-11-19 the user requested slightly larger filter/help text, a dynamic
+subtitle below Reportal Dashboard, and exact status colors for the entire report.
+All four slicer headers and items are now 14pt (previously 12pt); the Filters
+heading is 18pt (previously 16pt), and How to read this is 14pt (previously 12pt).
+Slicer queries, selection settings, and saved filter definitions were compared
+against pre-edit snapshots and remain identical. Help navigation is unchanged.
+
+The unframed subtitle at x=352, y=68, width=1296, height=36 binds Fiscal Period's
+Report Subtitle measure. Its wording is Data as of m/d/yyyy Refreshes daily and
+covers m/d/yyyy to m/d/yyyy. The user explicitly chose MAX(YTD Score[LoadDateTime])
+with report filters removed for the first date, rather than the selected snapshot
+date or today's date. This is source freshness in the imported data, not a
+semantic-model refresh timestamp. Coverage follows the selected PeriodStartDate
+and PeriodEndDate; no coverage range is asserted for missing/ambiguous periods.
+The requested daily-refresh statement does not configure or verify a refresh job.
+
+Every current source-status-colored visual binds the shared YTD Status Color
+mapping. The user-specified report-wide palette is yellow #D29F00, red #AA182C,
+green #2E7A3D; future weekly/matrix status visuals must use those same values.
+Neutral text, blue navigation controls, and source raw status tokens are unchanged.
+
+PHASE_6_VALIDATION.dax Q1 expectations use the new palette. Q6 checks dynamic
+coverage and filter-independent source freshness; Q7 checks all palette tokens,
+including case/whitespace and blank/hide/unknown neutral behavior. All seven
+blocks were executed read-only and pass, 35/35 cases in total. The actual source
+date is 11/16/2026; Period 10 2026 covers 10/11/2026 to 11/7/2026 and Period 9
+2026 covers 9/13/2026 to 10/10/2026. A retained current Period 10 2023 selection
+also displayed its corresponding 2023 coverage rather than a hardcoded sample.
+The first native render exposed an unwanted internal subtitle field label.
+After saving and closing Desktop, a subtitle-only correction applied default-state
+label visibility and 12pt nonbold, single-line value formatting with zero padding.
+The final native Desktop render on 2026-11-19 confirms the complete subtitle is
+visible beneath the title without an internal field label, clipping, or overlap
+with the KPI row. Enlarged filter and help text fit their existing controls.
+The current All/All/All and Period 10 2023 selections were preserved; coverage
+displays 10/8/2023 to 11/4/2023. No refresh schedule was configured, and no Phase 7
+work has started. Phase 6 user acceptance was subsequently recorded below.
+
+### Phase 6 Header Badge Padding
+
+On 2026-11-19 the user requested left and top padding on YTD Total Score, Care,
+Service, and Share. Each badge now has 12px left and 12px top outer-container
+padding, so the title and card content are inset together. Positions, sizes,
+right/bottom padding, bindings, status colors, and internal formatting are unchanged.
+All four edited JSON definitions parse, have no editor errors, and match their
+current pre-edit definitions exactly after removing the new padding object.
+No model expressions changed, so no additional DAX execution was required.
+Desktop was saved and closed before editing and reopened for the native check;
+the final maximized native render confirms consistent title/content insets and
+readable scores plus complete goal/change captions without clipping. Current
+All/All/All and Period 10 2024 selections are preserved. Desktop is open for review;
+Phase 6 user acceptance was subsequently recorded below.
+
+### Phase 6 Side Goals And Two-Line Source Subtitle
+
+On 2026-11-19 the user requested Goal beside each large score, a raised YTD line
+with bottom padding, and Refreshes daily / coverage below Data as of.
+Header Detail Text now supplies only the YTD week/change line. Header Goal Text
+and four fixed-metric wrappers retain the current annual-goal source and metric
+isolation. Four unframed native text cards place those goals to the score's right
+inside each existing badge; there are no additional decorative borders or fills.
+Badge bounds, score/color bindings, and 12px left/top padding are retained, and
+bottom padding is now 12px. Native reference-label wiring was tested, failed to
+render the card bodies, and was removed rather than left in the saved report.
+
+Report Data As Of and Report Refresh Coverage separately supply the native
+subtitle's value and below-value caption. Report Subtitle composes those same
+measures with a line break for validation. This avoids the native value renderer
+collapsing an embedded newline. The subtitle retains x=352/y=68/width=1296 and
+uses height=40, ending above the unchanged badge row at y=112. Freshness, selected
+calendar coverage, daily-refresh wording, and missing/multiple-period rules are
+unchanged. No refresh schedule was configured.
+
+Q6 now requires the subtitle line break. Q8 checks all four Goal 85 outputs and
+the individual one-line YTD captions for Period 10 2026 under an unrelated metric
+filter. All eight blocks were rerun against the reopened repair and passed,
+39/39 cases. The final maximized native Desktop render on 2026-11-19 confirms
+all four goals appear to the right of their large scores, one-line YTD captions
+fit above the 12px bottom inset, and the subtitle displays two distinct lines
+without clipping or overlap. Current All/All/All and Period 10 2024 selections
+are preserved; the displayed coverage is 10/13/2024 to 11/9/2024. The four goal
+text visuals have no background, outline, border, category label, or title.
+Desktop remains open for review. Phase 6 acceptance is recorded below;
+no Phase 7 work has started.
+
+### Phase 6 Acceptance Status
+
+On 2026-11-19 the user confirmed "Phase 6 tests good". Phase 6 is accepted and
+complete, including the final side-goal placement, YTD bottom spacing, two-line
+source subtitle, typography, and status palette. Retained evidence is 39/39
+passing model checks plus final native Desktop appearance verification.
+No report or semantic-model changes were made to record acceptance.
+Phase 7 remains unstarted; this acceptance does not start matrix implementation.
 
 ## Phase 7: Main Matrix
 

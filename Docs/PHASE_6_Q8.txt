@@ -1,0 +1,5 @@
+﻿"[Case]"	"[Goal]"	"[Detail]"	"[Expected Detail]"	"[Result]"
+"Overall"	"Goal 85"	"YTD W40 | +0 vs last wk"	"YTD W40 | +0 vs last wk"	"PASS"
+"Care"	"Goal 85"	"YTD W40 | +0 vs last wk"	"YTD W40 | +0 vs last wk"	"PASS"
+"Service"	"Goal 85"	"YTD W40 | +1 vs last wk"	"YTD W40 | +1 vs last wk"	"PASS"
+"Share"	"Goal 85"	"YTD W40 | +0 vs last wk"	"YTD W40 | +0 vs last wk"	"PASS"

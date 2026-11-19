@@ -1,0 +1,16 @@
+﻿"[Case]"	"[Actual]"	"[Expected]"	"[Actual Load]"	"[Result]"
+"Period 10 coverage"	"Data as of 11/16/2026
+Refreshes daily and covers 10/11/2026 to 11/7/2026"	"Data as of 11/16/2026
+Refreshes daily and covers 10/11/2026 to 11/7/2026"	"2026-11-16T13:02:00.0000000"	"PASS"
+"Period 9 coverage changes"	"Data as of 11/16/2026
+Refreshes daily and covers 9/13/2026 to 10/10/2026"	"Data as of 11/16/2026
+Refreshes daily and covers 9/13/2026 to 10/10/2026"	"2026-11-16T13:02:00.0000000"	"PASS"
+"No period omits coverage"	"Data as of 11/16/2026
+Refreshes daily"	"Data as of 11/16/2026
+Refreshes daily"	"2026-11-16T13:02:00.0000000"	"PASS"
+"Multiple periods omit coverage"	"Data as of 11/16/2026
+Refreshes daily"	"Data as of 11/16/2026
+Refreshes daily"	"2026-11-16T13:02:00.0000000"	"PASS"
+"Source freshness ignores filters"	"Data as of 11/16/2026
+Refreshes daily and covers 10/11/2026 to 11/7/2026"	"Data as of 11/16/2026
+Refreshes daily and covers 10/11/2026 to 11/7/2026"	"2026-11-16T13:02:00.0000000"	"PASS"

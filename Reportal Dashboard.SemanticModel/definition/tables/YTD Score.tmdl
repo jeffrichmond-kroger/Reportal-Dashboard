@@ -146,6 +146,173 @@ table 'YTD Score'
 		displayFolder: YTD
 		lineageTag: a9817601-29d7-459a-8fb5-10d104309036
 
+	measure 'Previous YTD Fiscal Week Key' =
+			VAR EndpointWeek = [Selected YTD Endpoint Week Key]
+			VAR EndpointStart =
+				CALCULATE (
+					SELECTEDVALUE ( 'Fiscal Week'[WeekStartDate] ),
+					REMOVEFILTERS ( 'Fiscal Period' ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					TREATAS ( { EndpointWeek }, 'Fiscal Week'[FiscalWeekKey] )
+				)
+			RETURN
+				IF (
+					NOT ISBLANK ( EndpointStart ),
+					CALCULATE (
+						SELECTEDVALUE ( 'Fiscal Week'[FiscalWeekKey] ),
+						REMOVEFILTERS ( 'Fiscal Period' ),
+						REMOVEFILTERS ( 'Fiscal Week' ),
+						TREATAS ( { EndpointStart - 7 }, 'Fiscal Week'[WeekStartDate] )
+					)
+				)
+		formatString: 0
+		displayFolder: Header Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309100
+
+	measure 'Previous YTD Score Value' =
+			VAR PriorWeek = [Previous YTD Fiscal Week Key]
+			VAR ScopeKey = [Selected Organization Scope Key]
+			VAR MetricKey = SELECTEDVALUE ( Metric[MetricKey] )
+			VAR PriorRows =
+				CALCULATETABLE (
+					'YTD Score',
+					REMOVEFILTERS ( 'Fiscal Period' ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					REMOVEFILTERS ( 'YTD Score' ),
+					TREATAS ( { PriorWeek }, 'YTD Score'[FiscalWeekKey] ),
+					TREATAS ( { ScopeKey }, 'YTD Score'[OrganizationScopeKey] ),
+					TREATAS ( { MetricKey }, 'YTD Score'[MetricKey] )
+				)
+			RETURN
+				IF (
+					NOT ISBLANK ( PriorWeek ) && NOT ISBLANK ( ScopeKey )
+						&& NOT ISBLANK ( MetricKey ) && COUNTROWS ( PriorRows ) = 1,
+					MAXX ( PriorRows, 'YTD Score'[ScoreValue] )
+				)
+		formatString: 0
+		displayFolder: Header Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309101
+
+	measure 'YTD Score Change' =
+			VAR CurrentScore = [YTD Score Value]
+			VAR PriorScore = [Previous YTD Score Value]
+			RETURN
+				IF (
+					NOT ISBLANK ( CurrentScore ) && NOT ISBLANK ( PriorScore ),
+					CurrentScore - PriorScore
+				)
+		formatString: +0;-0;+0
+		displayFolder: Header
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309102
+
+	measure 'YTD Status Color' =
+			SWITCH (
+				LOWER ( TRIM ( [YTD Color] ) ),
+				"red", "#AA182C",
+				"yellow", "#D29F00",
+				"green", "#2E7A3D",
+				"#616161"
+			)
+		displayFolder: Header
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309103
+
+	measure 'Latest YTD Source Load' = CALCULATE ( MAX ( 'YTD Score'[LoadDateTime] ), REMOVEFILTERS () )
+		formatString: m/d/yyyy
+		displayFolder: Report Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309117
+
+	measure 'Header Detail Text' =
+			VAR EndpointWeek = [Selected YTD Endpoint Week Key]
+			VAR WeekNumber =
+				CALCULATE (
+					SELECTEDVALUE ( 'Fiscal Week'[FiscalWeekNumber] ),
+					REMOVEFILTERS ( 'Fiscal Period' ),
+					REMOVEFILTERS ( 'Fiscal Week' ),
+					TREATAS ( { EndpointWeek }, 'Fiscal Week'[FiscalWeekKey] )
+				)
+			VAR ChangeValue = [YTD Score Change]
+			RETURN
+				IF (
+						ISBLANK ( [YTD Score Value] ),
+						"No YTD result",
+						"YTD W" & FORMAT ( WeekNumber, "0" ) & " | "
+							& IF ( ISBLANK ( ChangeValue ), "Change --", FORMAT ( ChangeValue, "+0;-0;+0" ) & " vs last wk" )
+					)
+		displayFolder: Header
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309104
+
+	measure 'Header Overall Score' = CALCULATE ( [YTD Score Value], REMOVEFILTERS ( Metric ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+		formatString: 0
+		displayFolder: Header\Overall
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309105
+
+	measure 'Header Overall Color' = CALCULATE ( [YTD Status Color], REMOVEFILTERS ( Metric ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+		displayFolder: Header\Overall
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309106
+
+	measure 'Header Overall Detail' = CALCULATE ( [Header Detail Text], REMOVEFILTERS ( Metric ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+		displayFolder: Header\Overall
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309107
+
+	measure 'Header Care Score' = CALCULATE ( [YTD Score Value], REMOVEFILTERS ( Metric ), TREATAS ( { 3 }, Metric[MetricKey] ) )
+		formatString: 0
+		displayFolder: Header\Care
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309108
+
+	measure 'Header Care Color' = CALCULATE ( [YTD Status Color], REMOVEFILTERS ( Metric ), TREATAS ( { 3 }, Metric[MetricKey] ) )
+		displayFolder: Header\Care
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309109
+
+	measure 'Header Care Detail' = CALCULATE ( [Header Detail Text], REMOVEFILTERS ( Metric ), TREATAS ( { 3 }, Metric[MetricKey] ) )
+		displayFolder: Header\Care
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309110
+
+	measure 'Header Service Score' = CALCULATE ( [YTD Score Value], REMOVEFILTERS ( Metric ), TREATAS ( { 2 }, Metric[MetricKey] ) )
+		formatString: 0
+		displayFolder: Header\Service
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309111
+
+	measure 'Header Service Color' = CALCULATE ( [YTD Status Color], REMOVEFILTERS ( Metric ), TREATAS ( { 2 }, Metric[MetricKey] ) )
+		displayFolder: Header\Service
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309112
+
+	measure 'Header Service Detail' = CALCULATE ( [Header Detail Text], REMOVEFILTERS ( Metric ), TREATAS ( { 2 }, Metric[MetricKey] ) )
+		displayFolder: Header\Service
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309113
+
+	measure 'Header Share Score' = CALCULATE ( [YTD Score Value], REMOVEFILTERS ( Metric ), TREATAS ( { 4 }, Metric[MetricKey] ) )
+		formatString: 0
+		displayFolder: Header\Share
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309114
+
+	measure 'Header Share Color' = CALCULATE ( [YTD Status Color], REMOVEFILTERS ( Metric ), TREATAS ( { 4 }, Metric[MetricKey] ) )
+		displayFolder: Header\Share
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309115
+
+	measure 'Header Share Detail' = CALCULATE ( [Header Detail Text], REMOVEFILTERS ( Metric ), TREATAS ( { 4 }, Metric[MetricKey] ) )
+		displayFolder: Header\Share
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309116
+
+	measure 'Header Goal Text' = "Goal " & COALESCE ( [Current Goal Display Text], "--" )
+		displayFolder: Header
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309118
+
+	measure 'Header Overall Goal' = CALCULATE ( [Header Goal Text], REMOVEFILTERS ( Metric ), TREATAS ( { 17 }, Metric[MetricKey] ) )
+		displayFolder: Header\Overall
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309119
+
+	measure 'Header Care Goal' = CALCULATE ( [Header Goal Text], REMOVEFILTERS ( Metric ), TREATAS ( { 3 }, Metric[MetricKey] ) )
+		displayFolder: Header\Care
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309120
+
+	measure 'Header Service Goal' = CALCULATE ( [Header Goal Text], REMOVEFILTERS ( Metric ), TREATAS ( { 2 }, Metric[MetricKey] ) )
+		displayFolder: Header\Service
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309121
+
+	measure 'Header Share Goal' = CALCULATE ( [Header Goal Text], REMOVEFILTERS ( Metric ), TREATAS ( { 4 }, Metric[MetricKey] ) )
+		displayFolder: Header\Share
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309122
+
 	column OrganizationScopeKey
 		dataType: string
 		isHidden

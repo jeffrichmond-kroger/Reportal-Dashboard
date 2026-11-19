@@ -1,0 +1,5 @@
+﻿"[Case]"	"[Result]"
+"Unrelated MetricKey and dashboard label filters"	"PASS"
+"Multiple periods keep all four scores blank"	"PASS"
+"No selected period keeps all four scores blank"	"PASS"
+"Invalid active Division keeps all four scores blank"	"PASS"

@@ -1,0 +1,5 @@
+﻿"[Metric Key]"	"[Headline]"	"[Expected Score]"	"[Expected Change]"	"[Expected Color]"	"[Actual Score]"	"[Actual Color]"	"[Detail]"	"[Actual Change]"	"[Current Goal]"	"[Endpoint]"	"[Prior Week]"	"[Result]"
+"17"	"Total Overall"	"65"	"0"	"#AA182C"	"65"	"#AA182C"	"YTD W40 | +0 vs last wk"	"0"	"85"	"202640"	"202639"	"PASS"
+"3"	"Care"	"72"	"0"	"#AA182C"	"72"	"#AA182C"	"YTD W40 | +0 vs last wk"	"0"	"85"	"202640"	"202639"	"PASS"
+"2"	"Service"	"83"	"1"	"#D29F00"	"83"	"#D29F00"	"YTD W40 | +1 vs last wk"	"1"	"85"	"202640"	"202639"	"PASS"
+"4"	"Share"	"45"	"0"	"#AA182C"	"45"	"#AA182C"	"YTD W40 | +0 vs last wk"	"0"	"85"	"202640"	"202639"	"PASS"

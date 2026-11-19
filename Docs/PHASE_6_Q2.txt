@@ -1,0 +1,6 @@
+﻿"[Case]"	"[Scope]"	"[Failures]"	"[Result]"
+"ALL"	"ALL"	"0"	"PASS"
+"DIV"	"DIV|011"	"0"	"PASS"
+"DIST"	"DIST|011|P1"	"0"	"PASS"
+"SITE"	"SITE|011|P1|259"	"0"	"PASS"
+"Unloaded period"	"ALL"	"0"	"PASS"

@@ -14,6 +14,32 @@ table 'Fiscal Period'
 		displayFolder: Period Context
 		lineageTag: a9817601-29d7-459a-8fb5-10d104309021
 
+	measure 'Report Data As Of' =
+			VAR LoadDate = [Latest YTD Source Load]
+			RETURN
+				"Data as of " & IF ( ISBLANK ( LoadDate ), "--", FORMAT ( LoadDate, "m/d/yyyy", "en-US" ) )
+		displayFolder: Period Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309023
+
+	measure 'Report Refresh Coverage' =
+			VAR PeriodStart = SELECTEDVALUE ( 'Fiscal Period'[PeriodStartDate] )
+			VAR PeriodEnd = SELECTEDVALUE ( 'Fiscal Period'[PeriodEndDate] )
+			VAR CoverageText =
+				IF (
+					HASONEVALUE ( 'Fiscal Period'[FiscalPeriodKey] )
+						&& NOT ISBLANK ( PeriodStart ) && NOT ISBLANK ( PeriodEnd ),
+					" and covers " & FORMAT ( PeriodStart, "m/d/yyyy", "en-US" )
+						& " to " & FORMAT ( PeriodEnd, "m/d/yyyy", "en-US" )
+				)
+			RETURN
+				"Refreshes daily" & CoverageText
+		displayFolder: Period Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309024
+
+	measure 'Report Subtitle' = [Report Data As Of] & UNICHAR ( 10 ) & [Report Refresh Coverage]
+		displayFolder: Period Context
+		lineageTag: a9817601-29d7-459a-8fb5-10d104309022
+
 	column FiscalPeriodKey
 		dataType: int64
 		isHidden

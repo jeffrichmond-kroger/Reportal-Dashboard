@@ -1,0 +1,7 @@
+﻿"[Week Key]"	"[Case]"	"[Expected]"	"[Actual]"	"[Result]"
+"202601"	"Missing current is not zero"			"PASS"
+"202602"	"Missing previous is not zero"			"PASS"
+"202603"	"Zero minus zero is zero"	"0"	"0"	"PASS"
+"202604"	"Positive change"	"1"	"1"	"PASS"
+"202605"	"Negative change"	"-1"	"-1"	"PASS"
+"202606"	"Current zero stays numeric"	"-5"	"-5"	"PASS"
