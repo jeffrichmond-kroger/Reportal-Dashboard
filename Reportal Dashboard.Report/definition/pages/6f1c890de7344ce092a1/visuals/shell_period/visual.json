@@ -3,10 +3,10 @@
   "name": "shell_period",
   "position": {
     "x": 24,
-    "y": 496,
+    "y": 320,
     "z": 5,
-    "width": 252,
-    "height": 96,
+    "width": 280,
+    "height": 80,
     "tabOrder": 3
   },
   "visual": {
@@ -88,7 +88,7 @@
             "textSize": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "12D"
                 }
               }
             }
@@ -101,7 +101,7 @@
             "textSize": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "12D"
                 }
               }
             }

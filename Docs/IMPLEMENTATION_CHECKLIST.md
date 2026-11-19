@@ -1,6 +1,6 @@
 # Reportal Dashboard Implementation Checklist
 
-Updated: 2026-11-18
+Updated: 2026-11-19
 
 Stop at each phase until all its exit checks pass. Static checks do not prove
 Desktop rendering, refresh, DAX evaluation, or data accuracy. Phase 4 must pass
@@ -34,7 +34,7 @@ before final visual recreation. Do not mark a phase complete based only on edits
 - [x] Phase 2: organization-scope logic (runtime gate passed 2026-11-17).
 - [x] Phase 3: base retrieval measures (runtime gate passed 2026-11-17).
 - [x] Phase 4: semantic-model data validation (accepted 2026-11-18 with approved historical-data exception).
-- [ ] Phase 5: report shell (rendering and scope regressions pass; final native interaction acceptance pending).
+- [x] Phase 5: report shell (final native filter-interaction acceptance confirmed by user 2026-11-19).
 - [ ] Phase 6: header score visuals.
 - [ ] Phase 7: main score matrix.
 - [ ] Phase 8: period navigation.
@@ -511,29 +511,50 @@ match this approval. A changed or additional finding blocks a future gate.
 
 - [x] Establish 1920 x 1080 layout, background, and left filters.
 - [x] Configure Division/District/Site native single-select dropdowns; clear selection means All.
-- [x] Add a single-period selector initialized to Period 10 2026 and an inert help placeholder.
+- [x] Add a single-period selector initialized to Period 10 2026.
+- [x] Restyle the filter rail and main-area Reportal Dashboard title from Score card template.png.
+- [x] Replace the help placeholder with an outlined How to read this button and native definitions page/return action.
 - [x] Define unique visual names, accessible labels, and tab order.
 - [x] Move Period below Site in the left sidebar and verify its rendered placement.
 - [x] Enforce the approved parent-first scope policy with source-backed runtime tests.
-- [ ] Test filter behavior and layout before adding header visuals.
+- [x] Verify the template-based shell and help round trip in Desktop.
+- [x] Test filter behavior and layout before adding header visuals (user accepted 2026-11-19).
 
 ### Phase 5 Shell Implementation
 
 New Dashboard page: 6f1c890de7344ce092a1, 1920 x 1080, FitToPage. The existing
 Page 1 and its goal-validation table/year filter are preserved unchanged.
-Dashboard is registered first and opens as the active page. Seven native
-visuals provide a neutral left filter band, Reportal title, three organization
-dropdowns, a fiscal-period dropdown, and a noninteractive question-mark help
-placeholder. No score/header/matrix visuals were added during this phase.
+Dashboard is registered first and opens as the active page. Eight native
+visuals provide a light-gray left filter band, Filters heading, main-area
+Reportal Dashboard title, three organization dropdowns, a fiscal-period
+dropdown, and an outlined How to read this button. No KPI or matrix visuals
+were added during this phase.
 
 Organization dropdowns bind DivisionDisplay, DistrictDisplay, and SiteDisplay
 on the disconnected Organization table, with default native interactions.
 Each permits one selected value; clearing that selection represents All rather
-than enumerating multiple values. Period is at x=24, y=496, width=252, height=96,
-aligned below Site with a 24-pixel gap. The period dropdown binds PeriodLabel and
+than enumerating multiple values. The filter band is 328 pixels wide. All four
+dropdowns are x=24, width=280, height=80, at y=68/152/236/320 respectively;
+Period remains below Site. The period dropdown binds PeriodLabel and
 stores Period 10 2026 as its actual initial slicer selection, not a page filter
 that prevents later changes. No year restriction was introduced by the approved
-historical-data exception. Help has no fabricated link or action.
+historical-data exception. Saved Division All, District P2, and other existing
+slicer states were preserved during restyling; a retained child selection is
+still ignored when its parent is All under the approved scope policy.
+
+The 2026-11-19 styling reference is
+[Score card template.png](Score%20card%20template.png). Its compact gray rail,
+restrained typography, main-area title, and blue outlined help treatment replace
+the initial shell styling without adding its example Business Unit field.
+The existing Division/District/Site/Period fields remain authoritative. Example
+refresh timestamps, coverage dates, and daily-refresh claims were not copied:
+their production source/refresh contract has not been established.
+
+The native help button navigates to page 8b23f01a596e4ac6a721, How to read this,
+hidden from the reading-mode page list. A native left-arrow button returns to
+Dashboard. Help text records the already-approved organization, YTD, current-goal,
+blank-value, and source-status rules. No external URL, bookmark data snapshot,
+source connection, model expression, or validation-page content was changed.
 
 Local checks pass for JSON parsing, model field bindings, unique visual IDs,
 accessible names, distinct tab order, selection settings, canvas bounds, and
@@ -544,6 +565,24 @@ Period 10 2026, readable labels, and no clipping or visual errors. No custom
 visual or hierarchy-slicer replacement was introduced. Local structural checks
 are not full JSON Schema validation; Desktop loading/rendering is actual runtime
 evidence. The validation page files were not edited.
+
+The 2026-11-19 restyle passes focused JSON parsing, canvas bounds, unique visual
+IDs/tab order, and bidirectional page-navigation target checks. Each of the four
+slicer query bindings, selection settings, and saved filter definitions exactly
+matches its pre-edit state. Editor diagnostics report no errors. These checks
+do not replace Desktop rendering and interaction verification for the restyle.
+
+Actual Desktop verification on 2026-11-19 confirms the compact gray filter rail,
+readable Reportal Dashboard title, preserved Division All / District P2 / Site
+All / Period 10 2026 captions, and the top-right white button with blue outline
+and readable How to read this label. The native action opens the definitions
+page; all four sections render without clipping, and its visible left-arrow
+action returns to Dashboard. Native button visibility is configured without a
+state selector, while label/icon/fill/outline styles use the default-state
+selector. This separation is required to avoid invisible content or theme fill
+overrides. The project was closed normally before each external report edit;
+no source refresh was performed. The user accepted final native filter
+cascading, clearing, and period-change interactions on 2026-11-19.
 
 ### Phase 5 Parent-First Scope Contract
 
@@ -581,9 +620,14 @@ scopes; invalid active levels; and native SUMMARIZECOLUMNS filter semantics.
 All ten Phase 4 queries were rerun: 1,595 PASS, only the same two explicitly
 approved historical exceptions, and no new unapproved gate failures.
 
-Final manual/native interaction acceptance still needs cascading dropdown
-choices, clearing selections, and period changes checked on the actual shell.
-Do not start Phase 6 until that remaining Phase 5 exit check is complete.
+### Phase 5 Acceptance
+
+On 2026-11-19 the user confirmed "final filter-interaction accepted", accepting
+the remaining native cascading dropdown, clear-selection, and period-change
+checks on the actual shell. Together with the recorded Desktop rendering,
+help-navigation verification, and scope regression evidence, this completes
+Phase 5. Phase 6 header score visuals remain unstarted; change-badge meaning
+and source must still be confirmed before badges are implemented.
 
 ## Phase 6: Header Scores
 

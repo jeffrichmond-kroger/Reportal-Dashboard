@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
   "name": "shell_brand",
   "position": {
-    "x": 24,
-    "y": 28,
+    "x": 352,
+    "y": 20,
     "z": 1,
-    "width": 252,
-    "height": 68,
+    "width": 920,
+    "height": 48,
     "tabOrder": 5
   },
   "visual": {
@@ -19,12 +19,12 @@
               {
                 "textRuns": [
                   {
-                    "value": "Reportal",
+                    "value": "Reportal Dashboard",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "28pt",
+                      "fontSize": "20pt",
                       "fontWeight": "bold",
-                      "color": "#242424"
+                      "color": "#111111"
                     }
                   }
                 ]

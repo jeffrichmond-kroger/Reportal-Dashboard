@@ -3,10 +3,10 @@
   "name": "shell_site",
   "position": {
     "x": 24,
-    "y": 376,
+    "y": 236,
     "z": 4,
-    "width": 252,
-    "height": 96,
+    "width": 280,
+    "height": 80,
     "tabOrder": 2
   },
   "visual": {
@@ -88,7 +88,7 @@
             "textSize": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "12D"
                 }
               }
             }
@@ -101,7 +101,7 @@
             "textSize": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "12D"
                 }
               }
             }
